@@ -372,6 +372,22 @@ class _HomePageState extends State<HomePage> {
                   SectionTitle(context.l10n.pinnedForums),
                   _forumCollection(pinned),
                 ],
+                if (recent.isNotEmpty &&
+                    app.settings.getBool('homePageShowHistoryForum')) ...[
+                  SectionTitle(context.l10n.recentForums),
+                  SurfaceCard(
+                    child: Column(
+                      children: recent
+                          .map(
+                            (forum) => ForumTile(
+                              forum: forum,
+                              onTap: () => openForum(context, forum.name),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ],
                 SectionTitle(
                   context.l10n.followedForums,
                   trailing: Row(
@@ -421,23 +437,6 @@ class _HomePageState extends State<HomePage> {
                   )
                 else
                   _forumCollection(forums),
-                if (recent.isNotEmpty &&
-                    app.settings.getBool('homePageShowHistoryForum')) ...[
-                  SectionTitle(context.l10n.recentForums),
-                  SurfaceCard(
-                    child: Column(
-                      children: recent
-                          .take(5)
-                          .map(
-                            (forum) => ForumTile(
-                              forum: forum,
-                              onTap: () => openForum(context, forum.name),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
-                ],
               ],
             ),
           );

@@ -272,6 +272,102 @@ void main() {
     expect(local.getDraft('reply')?.content, 'Second');
   });
 
+  test(
+    'recent forums keep five FIFO entries across revisits and restart',
+    () async {
+      final local = LocalStore();
+      await local.init();
+      for (var id = 1; id <= 5; id++) {
+        await local.recordForum(Forum(id: '$id', name: 'Forum $id'));
+      }
+      await local.recordForum(const Forum(id: 'updated', name: 'Forum 1'));
+      expect(local.recentForums.map((forum) => forum.name), [
+        'Forum 5',
+        'Forum 4',
+        'Forum 3',
+        'Forum 2',
+        'Forum 1',
+      ]);
+      expect(local.recentForums.last.id, 'updated');
+      expect(local.forumHistories.first.forum.name, 'Forum 1');
+
+      final restarted = LocalStore();
+      await restarted.init();
+      await restarted.recordForum(const Forum(id: '6', name: 'Forum 6'));
+      expect(restarted.recentForums.map((forum) => forum.name), [
+        'Forum 6',
+        'Forum 5',
+        'Forum 4',
+        'Forum 3',
+        'Forum 2',
+      ]);
+      expect(restarted.forumHistories, hasLength(6));
+      expect(restarted.forumHistories[1].forum.name, 'Forum 1');
+
+      await local.activateAccount(null);
+      expect(local.recentForums.map((forum) => forum.name), [
+        'Forum 6',
+        'Forum 5',
+        'Forum 4',
+        'Forum 3',
+        'Forum 2',
+      ]);
+      await local.recordForum(const Forum(id: 'updated', name: 'Forum 1'));
+      expect(local.recentForums.map((forum) => forum.name), [
+        'Forum 1',
+        'Forum 6',
+        'Forum 5',
+        'Forum 4',
+        'Forum 3',
+      ]);
+      expect(local.forumHistories, hasLength(6));
+    },
+  );
+
+  test('legacy recents are capped without losing full forum history', () async {
+    const key = 'tieba_lite.local.v1.guest';
+    SharedPreferences.setMockInitialValues({
+      key: jsonEncode({
+        'version': 1,
+        'recentForums': [
+          for (var id = 7; id >= 1; id--)
+            Forum(id: '$id', name: 'Forum $id').toJson(),
+        ],
+      }),
+    });
+    final local = LocalStore();
+    await local.init();
+    expect(local.recentForums.map((forum) => forum.name), [
+      'Forum 7',
+      'Forum 6',
+      'Forum 5',
+      'Forum 4',
+      'Forum 3',
+    ]);
+    expect(local.forumHistories, hasLength(7));
+    expect(
+      local.forumHistories.every((entry) => entry.visitedAt == null),
+      isTrue,
+    );
+    await local.recordForum(const Forum(id: '8', name: 'Forum 8'));
+
+    final restarted = LocalStore();
+    await restarted.init();
+    expect(restarted.recentForums.map((forum) => forum.name), [
+      'Forum 8',
+      'Forum 7',
+      'Forum 6',
+      'Forum 5',
+      'Forum 4',
+    ]);
+    expect(restarted.forumHistories, hasLength(8));
+    final preferences = await SharedPreferences.getInstance();
+    expect(
+      jsonDecode(preferences.getString(key)!)['recentForums'],
+      hasLength(5),
+    );
+  });
+
   test('legacy recent forums migrate without inventing visit dates', () async {
     const key = 'tieba_lite.local.v1.guest';
     SharedPreferences.setMockInitialValues({

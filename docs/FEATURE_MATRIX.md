@@ -9,7 +9,7 @@ This document distinguishes implemented Flutter code from verified behavior. A s
 | Upstream behavior | Flutter implementation | Verification / remaining difference |
 | --- | --- | --- |
 | Four main destinations; optional hidden Explore | `MainShell`, Home, Discover, Inbox, Me; optional swipe navigation | Dart analysis; phone layout still requires device acceptance |
-| Followed, pinned, recent forums; list/grid | `HomePage`, account-scoped pins and recents | Followed forums need an authenticated account; local storage verified separately |
+| Followed, pinned, recent forums; list/grid | `HomePage`, account-scoped pins and recents; recent forums appear before followed forums | Recents retain five distinct forums in FIFO order, newest arrivals displayed first; revisits update metadata without changing queue position. Full forum history remains separate. Followed forums need an authenticated account |
 | One-key sign-in for followed forums | Explicit confirmation; optional official batch request counts confirmed forum IDs only, sequential fallback for remaining forums, configurable one-second pause | No authenticated sign-in requests executed |
 | Concern, personalized, hot feed | Three native tabs; real API loaders, hot categories and topic ranking | Guest personalized/hot endpoints probed; concern needs account |
 | Hot topic list | Native ranking list and topic metadata screen | Guest ranking/overview endpoints probed; current topic detail endpoint returns metadata but no thread list, so an honest empty state is shown rather than synthesized discussions |

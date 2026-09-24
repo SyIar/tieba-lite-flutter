@@ -151,6 +151,7 @@ class BlockRule {
 /// Local records are separate from credentials and scoped to the active account.
 class LocalStore extends ChangeNotifier {
   static const _prefix = 'tieba_lite.local.v1.';
+  static const _recentForumLimit = 5;
   SharedPreferences? _preferences;
   String _namespace = 'guest';
   JsonMap _data = _emptyData();
@@ -222,6 +223,9 @@ class LocalStore extends ChangeNotifier {
             )
             .toList(),
       ...objectValue(parsed),
+      'recentForums': listValue(parsed['recentForums'])
+          .take(_recentForumLimit)
+          .toList(),
     };
   }
 
@@ -294,11 +298,17 @@ class LocalStore extends ChangeNotifier {
 
   Future<void> recordForum(Forum forum) => _update((data) {
     if (forum.name.isEmpty) return;
-    data['recentForums'] = [
-      forum.toJson(),
-      ...listValue(data['recentForums'])
-          .where((item) => objectValue(item)['name'] != forum.name),
-    ].take(40).toList();
+    // Newest arrivals are displayed first; revisits keep their FIFO position.
+    final recent = listValue(data['recentForums']);
+    final index = recent.indexWhere(
+      (item) => objectValue(item)['name'] == forum.name,
+    );
+    if (index < 0) {
+      recent.insert(0, forum.toJson());
+    } else {
+      recent[index] = forum.toJson();
+    }
+    data['recentForums'] = recent.take(_recentForumLimit).toList();
     data['forumHistory'] = [
       ForumHistoryEntry(forum: forum, visitedAt: DateTime.now()).toJson(),
       ...listValue(data['forumHistory']).where(
