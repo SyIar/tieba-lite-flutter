@@ -15,7 +15,7 @@ TiebaLite 的 Flutter / iOS 迁移工程，默认中文，保留原项目已经�
 
 Windows 用于 Dart 分析、协议验证和共享 UI 预览。iOS device 构建必须在 macOS/Xcode 完成。GitHub Actions 产出供 Sideloadly 重新签名的 unsigned IPA，不要求将 Apple ID 或签名证书上传到 GitHub。
 
-GitHub 仓库创建、可见性以及云构建费用须经用户确认后才执行。工作流为手动触发，未配置自动发布、推送触发或账号凭据。
+公开仓库为 [SyIar/tieba-lite-flutter](https://github.com/SyIar/tieba-lite-flutter)。工作流使用标准 GitHub-hosted runner，手动触发，未配置自动发布、推送触发或 Apple 账号凭据。实际构建与制品状态见 [VALIDATION.md](docs/VALIDATION.md)。
 
 操作说明见 [BUILD_IOS.md](docs/BUILD_IOS.md)，迁移状态见 [FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md)，验收边界见 [MIGRATION_PLAN.md](docs/MIGRATION_PLAN.md)。
 

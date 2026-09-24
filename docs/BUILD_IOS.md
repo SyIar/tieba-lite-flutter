@@ -2,7 +2,7 @@
 
 ## 当前边界
 
-仓库内已准备 `.github/workflows/ios-unsigned.yml`。准备工作流不代表已经运行成功，也不代表 IPA 已生成。首次 macOS 编译以及 iPhone 真机验收须分别记录结果。
+`.github/workflows/ios-unsigned.yml` 已在 [run 35995600459](https://github.com/SyIar/tieba-lite-flutter/actions/runs/35995600459) 成功执行。unsigned IPA 已下载并验证到 `D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`；版本来源、校验值和待完成的 iPhone 验收见 [VALIDATION.md](VALIDATION.md)。
 
 该工作流只通过 Actions 页面手动触发，普通 push 不会触发构建。用户已于 2026-09-24 确认使用公开仓库 [SyIar/tieba-lite-flutter](https://github.com/SyIar/tieba-lite-flutter) 和标准 GitHub-hosted runner；未启用付费 runner 或修改账单设置。
 

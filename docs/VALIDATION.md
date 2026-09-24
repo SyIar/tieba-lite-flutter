@@ -14,9 +14,19 @@
 
 所有 protocol 写操作测试均为本地合成 fixture。没有使用真实账号执行回复、签到、关注、删帖、举报或资料修改。
 
+## 云构建记录
+
+- 公开仓库：[SyIar/tieba-lite-flutter](https://github.com/SyIar/tieba-lite-flutter)。用户授权后创建并上传；工作流仅使用标准 runner。
+- [首次运行 35994661467](https://github.com/SyIar/tieba-lite-flutter/actions/runs/35994661467)，source `77213f39a4984bf22c5c93916bf012b077ee0948`：Linux job 的分析、56 tests、仓库检查、Web release 全部通过；iOS 编译失败。runner 默认 Xcode 16.4 不包含 `connectivity_plus 7.3.1` 使用的 `NWPath.isUltraConstrained` API。
+- 修复：在 iOS job 使用 `DEVELOPER_DIR` 选择 runner 已安装的 Xcode 26.3，保持依赖锁与 iOS 15 最低运行版本。
+- [第二次运行 35995600459](https://github.com/SyIar/tieba-lite-flutter/actions/runs/35995600459)，source `3c0ba34e243f33269134869be383c6a5aa7a436e`，build `2`：两个 job 全部成功。Linux 再次通过全部 56 tests、Dart analyze 和 Web release；macOS 使用 Xcode `26.3 / 17C529`，成功编译 `Runner.app`、校验并上传 IPA。
+- artifact：`TiebaLite-iOS-unsigned-2`，包含 IPA、`SHA256SUMS`、`build-info.json`；GitHub 保存 7 天，本机另留固定副本。
+- 本机文件：`D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`，大小 `24,652,611` bytes。下载后重新检查 ZIP 完整性、device 平台、Runner / App.framework / Flutter.framework 的 arm64、source commit，以及复制前后 SHA-256，全部通过。
+- IPA SHA-256：`52dbf0fce2e8ff84a12a3d5b221a949d944eac77ac6572aa1e82fdcd8885c5f3`。
+- bundle identifier：`org.tblite.flutter.tiebaLite`。本制品未签名，尚未安装到 iPhone；上述成功不代表真机业务验收完成。
+
 ## 待验证
 
-- GitHub Actions 的 macOS / Xcode 实际编译及 unsigned IPA 结构校验。
 - Sideloadly 重新签名和 iPhone 安装、启动。
 - iPhone 上的真实百度登录、Keychain、WebView cookies、相册、媒体、分享、alternate icons、incoming links。
 - 登录后的服务端接口与用户主动选择的写操作。
