@@ -1,4 +1,4 @@
-"""Generate the project's original geometric speech-bubble icon with Pillow."""
+"""Resize the primary icon master and retain the existing alternate palettes."""
 
 import json
 from pathlib import Path
@@ -20,24 +20,31 @@ def render_icon(background, foreground):
 
 
 palettes = {
-    "AppIcon": ("#167D8D", "#F7FCFC"),
     "AppIconBlue": ("#355CCE", "#F7F9FF"),
     "AppIconDark": ("#17222C", "#8BDAD7"),
 }
-for name, palette in palettes.items():
+with Image.open(root / "assets/branding/app-icon.png") as source:
+    if source.width != source.height:
+        raise ValueError("The primary icon must be square")
+    if source.mode == "RGBA" and source.getchannel("A").getextrema() != (255, 255):
+        raise ValueError("The primary icon must be opaque")
+    primary = source.convert("RGB")
+
+canvases = {"AppIcon": primary}
+canvases.update({name: render_icon(*palette) for name, palette in palettes.items()})
+for name, canvas in canvases.items():
     icons = assets / f"{name}.appiconset"
     icons.mkdir(exist_ok=True)
     (icons / "Contents.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    canvas = render_icon(*palette)
     for item in metadata["images"]:
         if "filename" not in item:
             continue
         pixels = round(float(item["size"].split("x")[0]) * float(item["scale"].rstrip("x")))
         canvas.resize((pixels, pixels), Image.Resampling.LANCZOS).save(icons / item["filename"])
 
-canvas = render_icon(*palettes["AppIcon"])
+canvas = primary
 for pixels in (192, 512):
     for name in (f"Icon-{pixels}.png", f"Icon-maskable-{pixels}.png"):
         canvas.resize((pixels, pixels), Image.Resampling.LANCZOS).save(root / "web/icons" / name)
 canvas.resize((32, 32), Image.Resampling.LANCZOS).save(root / "web/favicon.png")
-print("Generated three original iOS icon palettes and preview icons.")
+print("Generated primary iOS and web icons; retained alternate icon palettes.")
