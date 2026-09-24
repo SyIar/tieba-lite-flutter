@@ -41,7 +41,11 @@ class _ForumPageState extends State<ForumPage> {
     _list.currentState?.reload();
   }
 
-  Future<void> _action(Future<void> Function() request) async {
+  Future<void> _action(
+    Future<void> Function() request, {
+    VoidCallback? onSuccess,
+  }) async {
+    final app = AppScope.read(context);
     setState(() => _busy = true);
     final succeeded = await performAction(
       context,
@@ -49,8 +53,13 @@ class _ForumPageState extends State<ForumPage> {
       success: context.l10n.operationSucceeded,
     );
     if (mounted) {
-      setState(() => _busy = false);
-      if (succeeded) _reload();
+      final sameAccount =
+          !app.changingAccount && app.session?.userId == _routeAccountId;
+      setState(() {
+        _busy = false;
+        if (succeeded && sameAccount) onSuccess?.call();
+      });
+      if (succeeded && sameAccount) _reload();
     }
   }
 
@@ -157,7 +166,7 @@ class _ForumPageState extends State<ForumPage> {
                             const SizedBox(height: 4),
                             if (!app.settings.getBool('hideForumIntroAndStat'))
                               Text(
-                                '${context.l10n.members} ${compactCount(forum.memberCount)}  ·  ${context.l10n.posts} ${compactCount(forum.threadCount)}',
+                                '${context.l10n.members} ${forum.memberCount == null ? '—' : compactCount(forum.memberCount!)}  ·  ${context.l10n.posts} ${compactCount(forum.threadCount)}',
                                 style: TextStyle(
                                   color: context.colors.onSurfaceVariant,
                                   fontSize: 12,
@@ -209,9 +218,11 @@ class _ForumPageState extends State<ForumPage> {
                       OutlinedButton.icon(
                         onPressed: _busy || forum.isSigned || forum.id.isEmpty
                             ? null
-                            : () => _action(() async {
-                                await app.api.signForum(forum);
-                              }),
+                            : () => _action(
+                                () => app.api.signForum(forum),
+                                onSuccess: () =>
+                                    _forum = forum.copyWith(isSigned: true),
+                              ),
                         icon: const Icon(Icons.task_alt_rounded, size: 18),
                         label: Text(
                           forum.isSigned
@@ -364,7 +375,7 @@ class _ForumInfoPageState extends State<ForumInfoPage> {
                     ),
                     const SizedBox(height: 18),
                     Text(
-                      '${context.l10n.members}  ${compactCount(forum.memberCount)}\n${context.l10n.posts}  ${compactCount(forum.threadCount)}',
+                      '${context.l10n.members}  ${forum.memberCount == null ? '—' : compactCount(forum.memberCount!)}\n${context.l10n.posts}  ${compactCount(forum.threadCount)}',
                       style: const TextStyle(height: 1.8),
                     ),
                   ],

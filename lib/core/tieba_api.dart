@@ -1320,15 +1320,22 @@ Forum _forum(JsonMap data, {String fallbackName = ''}) => Forum(
       : _first(data, ['name', 'forum_name', 'forum_name_show']),
   avatar: _https(_first(data, ['avatar', 'avatar_url'])),
   description: _first(data, ['slogan', 'intro', 'description', 'desc']),
-  memberCount: intValue(
-    data['member_num'] ?? data['member_count'] ?? data['concern_num'],
+  memberCount: int.tryParse(
+    stringValue(
+      data['member_num'] ?? data['member_count'] ?? data['concern_num'],
+    ),
   ),
   threadCount: intValue(
     data['thread_num'] ?? data['thread_count'] ?? data['post_num'],
   ),
   level: intValue(data['user_level'] ?? data['level_id']),
   isFollowing: boolValue(data['is_like']) || boolValue(data['has_concerned']),
-  isSigned: boolValue(data['is_sign_in']),
+  isSigned: boolValue(
+    data['is_sign_in'] ??
+        objectValue(
+          objectValue(data['sign_in_info'])['user_info'],
+        )['is_sign_in'],
+  ),
 );
 
 ThreadSummary _thread(

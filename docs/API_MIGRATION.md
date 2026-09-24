@@ -32,6 +32,21 @@ installed. Login credential candidates are redacted even before an active sessio
 keeps fresh `anti.tbs` values scoped to the account that made the request. Unknown content
 preserves its text instead of pretending to support every optional server extension.
 
+### Forum statistics and check-in state
+
+The upstream [`GetForumListBean.ForumInfo`](https://github.com/HuanCheng65/TiebaLite/blob/2885b2aabbbf47aba7bf12b1cd7cbc03b1f5ec15/app/src/main/java/com/huanchengfly/tieba/post/api/models/GetForumListBean.kt)
+has `user_level` and `is_sign_in`, but no member-count field. Home followed-forum rows
+therefore show the account level and check-in status. They do not issue an extra detail
+request for every forum. An absent `memberCount` remains `null`, distinct from a real zero;
+forum pages continue to display the `member_num` supplied by the detail response.
+
+The forum-page protobuf stores check-in state under
+`forum.sign_in_info.user_info.is_sign_in`; the followed-forum list uses the flat
+`is_sign_in` field. Both shapes map to `Forum.isSigned`. After a successful sign request,
+the current forum button immediately becomes disabled with the completed label before
+reloading. Failed sign requests leave it available. Home reloads followed forums when
+returning from a forum route so its status reflects the updated server response.
+
 ### Signing and schemas
 
 JSON/form `sign` is uppercase MD5 of UTF-8 encoded, lexicographically sorted decoded

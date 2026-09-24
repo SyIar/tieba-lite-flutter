@@ -40,6 +40,7 @@
   "signAllConfirm": "使用当前账户为关注的吧签到？",
   "checkIn": "签到",
   "checkedIn": "已签到",
+  "notCheckedIn": "未签到",
   "follow": "关注",
   "unfollow": "取消关注",
   "following": "关注",

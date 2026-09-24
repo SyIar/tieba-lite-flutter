@@ -40,6 +40,7 @@
   "signAllConfirm": "Check in to all followed forums with your current account?",
   "checkIn": "Check in",
   "checkedIn": "Checked in",
+  "notCheckedIn": "Not checked in",
   "follow": "Follow",
   "unfollow": "Unfollow",
   "following": "Following",

@@ -116,15 +116,27 @@ class Forum {
     this.name = '',
     this.avatar = '',
     this.description = '',
-    this.memberCount = 0,
+    this.memberCount,
     this.threadCount = 0,
     this.level = 0,
     this.isFollowing = false,
     this.isSigned = false,
   });
   final String id, name, avatar, description;
-  final int memberCount, threadCount, level;
+  final int? memberCount;
+  final int threadCount, level;
   final bool isFollowing, isSigned;
+  Forum copyWith({bool? isSigned}) => Forum(
+    id: id,
+    name: name,
+    avatar: avatar,
+    description: description,
+    memberCount: memberCount,
+    threadCount: threadCount,
+    level: level,
+    isFollowing: isFollowing,
+    isSigned: isSigned ?? this.isSigned,
+  );
   JsonMap toJson() => {
     'id': id,
     'name': name,
@@ -141,7 +153,9 @@ class Forum {
     name: stringValue(json['name']),
     avatar: stringValue(json['avatar']),
     description: stringValue(json['description']),
-    memberCount: intValue(json['memberCount']),
+    memberCount: json['memberCount'] == null
+        ? null
+        : intValue(json['memberCount']),
     threadCount: intValue(json['threadCount']),
     level: intValue(json['level']),
     isFollowing: boolValue(json['isFollowing']),

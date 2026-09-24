@@ -71,6 +71,48 @@ List<int> multipartData(RequestOptions options, Uint8List bytes) {
 
 void main() {
   test(
+    'followed forums distinguish missing member counts from real zero',
+    () async {
+      final adapter = FixtureAdapter((options, _) {
+        expect(options.path, endsWith('/c/f/forum/getforumlist'));
+        return jsonBody({
+          'error_code': '0',
+          'forum_info': [
+            {
+              'forum_id': '1',
+              'forum_name': 'Missing count',
+              'user_level': '5',
+              'is_sign_in': '1',
+            },
+            {'forum_id': '2', 'forum_name': 'Empty forum', 'member_num': '0'},
+            {
+              'forum_id': '3',
+              'forum_name': 'Populated forum',
+              'member_num': '456',
+            },
+          ],
+        });
+      });
+      final api = TiebaApi(
+        sessionProvider: () => const TiebaSession(
+          userId: '42',
+          bduss: 'fixture-bduss',
+          stoken: 'fixture-stoken',
+        ),
+        dio: Dio()..httpClientAdapter = adapter,
+      );
+      final forums = await api.followedForums();
+      expect(forums.map((forum) => forum.memberCount), [null, 0, 456]);
+      expect(forums.first.level, 5);
+      expect(forums.first.isSigned, isTrue);
+      expect(forums.every((forum) => forum.isFollowing), isTrue);
+      expect(Forum.fromJson(forums.first.toJson()).memberCount, isNull);
+      expect(adapter.count, 1);
+      api.close();
+    },
+  );
+
+  test(
     'same-account login replaces a tbs cached under the previous session',
     () async {
       var session = const TiebaSession(

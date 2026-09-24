@@ -107,9 +107,9 @@ class _RetainedTabState extends State<_RetainedTab>
   }
 }
 
-void openForum(BuildContext context, String name) {
+Future<void> openForum(BuildContext context, String name) async {
   if (name.trim().isNotEmpty) {
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute<void>(builder: (_) => ForumPage(name: name.trim())),
     );
@@ -185,6 +185,11 @@ class _HomePageState extends State<HomePage> {
   Future<List<Forum>>? _forums;
   String? _account;
   bool _signing = false;
+  Future<void> _openForum(String name) async {
+    await openForum(context, name);
+    if (mounted) await _refresh();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -203,7 +208,9 @@ class _HomePageState extends State<HomePage> {
     final next = app.isLoggedIn
         ? app.api.followedForums()
         : Future.value(<Forum>[]);
-    setState(() => _forums = next);
+    setState(() {
+      _forums = next;
+    });
     try {
       await next;
     } catch (_) {
@@ -275,7 +282,7 @@ class _HomePageState extends State<HomePage> {
                 hint: context.l10n.enterForum,
               );
               if (context.mounted && name != null && name.isNotEmpty) {
-                openForum(context, name);
+                _openForum(name);
               }
             },
             icon: const Icon(Icons.add_rounded),
@@ -381,7 +388,7 @@ class _HomePageState extends State<HomePage> {
                           .map(
                             (forum) => ForumTile(
                               forum: forum,
-                              onTap: () => openForum(context, forum.name),
+                              onTap: () => _openForum(forum.name),
                             ),
                           )
                           .toList(),
@@ -454,7 +461,15 @@ class _HomePageState extends State<HomePage> {
               .map(
                 (forum) => ForumTile(
                   forum: forum,
-                  onTap: () => openForum(context, forum.name),
+                  onTap: () => _openForum(forum.name),
+                  subtitle: forum.isFollowing
+                      ? [
+                          if (forum.level > 0) 'Lv.${forum.level}',
+                          forum.isSigned
+                              ? context.l10n.checkedIn
+                              : context.l10n.notCheckedIn,
+                        ].join(' · ')
+                      : null,
                   trailing: _pinButton(forum),
                 ),
               )
@@ -482,7 +497,7 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(18),
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
-                onTap: () => openForum(context, forum.name),
+                onTap: () => _openForum(forum.name),
                 onLongPress: () => app.local.togglePinnedForum(forum),
                 child: Padding(
                   padding: const EdgeInsets.all(12),

@@ -21,25 +21,31 @@ class ForumTile extends StatelessWidget {
   final Widget? trailing;
   final String? subtitle;
   @override
-  Widget build(BuildContext context) => ListTile(
-    onTap: onTap,
-    leading: UserAvatar(url: forum.avatar, name: forum.name, radius: 24),
-    title: Text(
-      forum.name,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: const TextStyle(fontWeight: FontWeight.w600),
-    ),
-    subtitle: Text(
-      subtitle ??
-          (forum.description.isNotEmpty
-              ? forum.description
-              : '${context.l10n.members} ${compactCount(forum.memberCount)}'),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    ),
-    trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
-  );
+  Widget build(BuildContext context) {
+    final detail =
+        subtitle ??
+        (forum.description.isNotEmpty
+            ? forum.description
+            : forum.memberCount != null
+            ? '${context.l10n.members} ${compactCount(forum.memberCount!)}'
+            : forum.level > 0
+            ? 'Lv.${forum.level}'
+            : null);
+    return ListTile(
+      onTap: onTap,
+      leading: UserAvatar(url: forum.avatar, name: forum.name, radius: 24),
+      title: Text(
+        forum.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: detail == null
+          ? null
+          : Text(detail, maxLines: 1, overflow: TextOverflow.ellipsis),
+      trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
+    );
+  }
 }
 
 class UserTile extends StatelessWidget {
