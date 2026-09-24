@@ -14,10 +14,19 @@ import 'package:tieba_lite/core/settings_store.dart';
 import 'package:tieba_lite/features/forum_page.dart';
 import 'package:tieba_lite/features/main_shell.dart';
 import 'package:tieba_lite/l10n/app_localizations.dart';
+import 'package:tieba_lite/widgets/content_cards.dart';
+import 'package:tieba_lite/widgets/common.dart';
+import 'package:tieba_lite/widgets/paged_list.dart';
 
-List<int> _forumResponse({required bool signed}) =>
+List<int> _forumResponse({
+  required bool signed,
+  List<JsonMap> threads = const [],
+  bool hasMore = false,
+}) =>
     (FrsPageResponse()..mergeFromProto3Json({
           'data': {
+            'page': {'has_more': hasMore ? 1 : 0},
+            'thread_list': threads,
             'forum': {
               'id': '9',
               'name': 'Fixture forum',
@@ -69,6 +78,110 @@ void main() {
 
   Finder checkInButton(String label) =>
       find.widgetWithText(OutlinedButton, label);
+
+  testWidgets(
+    'pinned threads stay grouped across pagination, blocking and refresh',
+    (tester) async {
+      await tester.runAsync(() async {
+        await app.settings.setBool('hideBlockedContent', true);
+        await app.local.addBlock(
+          const BlockRule(kind: BlockKind.thread, value: '5'),
+        );
+      });
+      var requests = 0;
+      JsonMap thread(String id, {bool pinned = false}) => {
+        'id': id,
+        'title': 'Thread $id',
+        'isTop': pinned ? 1 : 0,
+        '_abstract': [
+          {'text': 'Excerpt $id'},
+        ],
+      };
+      app.api.transport.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expectSync(options.path, contains('/frs/page'));
+            requests++;
+            handler.resolve(
+              Response<List<int>>(
+                requestOptions: options,
+                statusCode: 200,
+                data: _forumResponse(
+                  signed: false,
+                  hasMore: requests == 1,
+                  threads: switch (requests) {
+                    1 => [
+                      thread('1', pinned: true),
+                      thread('2', pinned: true),
+                      thread('5', pinned: true),
+                      thread('3'),
+                    ],
+                    2 => [thread('1', pinned: true), thread('4')],
+                    _ => [thread('1'), thread('3')],
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+      );
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<PinnedThreadList>(find.byType(PinnedThreadList))
+            .threads
+            .map((thread) => thread.id),
+        ['1', '2'],
+      );
+      expect(
+        tester
+            .widgetList<ThreadCard>(find.byType(ThreadCard))
+            .map((card) => card.thread.id),
+        ['3'],
+      );
+      expect(find.text('Thread 5'), findsNothing);
+      final list = tester.state<PagedListState<ThreadSummary>>(
+        find.byType(PagedList<ThreadSummary>),
+      );
+      final more = list.loadMore();
+      await tester.pumpAndSettle();
+      await more;
+      expect(
+        tester
+            .widgetList<ErrorPanel>(find.byType(ErrorPanel))
+            .map((panel) => panel.error.toString()),
+        isEmpty,
+      );
+      expect(requests, 2);
+      expect(
+        tester
+            .widget<PinnedThreadList>(find.byType(PinnedThreadList))
+            .threads
+            .map((thread) => thread.id),
+        ['1', '2'],
+      );
+      expect(find.text('Thread 1'), findsOneWidget);
+      expect(
+        tester
+            .widgetList<ThreadCard>(find.byType(ThreadCard))
+            .map((card) => card.thread.id),
+        ['3', '4'],
+      );
+      final refresh = list.reload();
+      await tester.pumpAndSettle();
+      await refresh;
+      expect(find.byType(PinnedThreadList), findsNothing);
+      expect(
+        tester
+            .widgetList<ThreadCard>(find.byType(ThreadCard))
+            .map((card) => card.thread.id),
+        ['1', '3'],
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 
   testWidgets(
     'home shows account status and refreshes it after a forum visit',

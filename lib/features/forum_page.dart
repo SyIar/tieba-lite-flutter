@@ -21,6 +21,7 @@ class _ForumPageState extends State<ForumPage> {
   bool _digest = false, _busy = false, _initialized = false;
   int _sort = 0;
   Forum? _forum;
+  List<ThreadSummary> _pinnedThreads = [];
   String? _routeAccountId;
   @override
   void didChangeDependencies() {
@@ -39,6 +40,14 @@ class _ForumPageState extends State<ForumPage> {
 
   void _reload() {
     _list.currentState?.reload();
+  }
+
+  bool _showThread(ThreadSummary thread) {
+    final app = AppScope.read(context);
+    return (!app.local.blocksThread(thread) ||
+            (!app.settings.getBool('hideBlockedContent') &&
+                app.settings.getBool('showBlockTip', fallback: true))) &&
+        !(app.settings.blockVideo && thread.videoUrl.isNotEmpty);
   }
 
   Future<void> _action(
@@ -67,6 +76,7 @@ class _ForumPageState extends State<ForumPage> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final forum = _forum ?? Forum(name: widget.name);
+    final pinned = _pinnedThreads.where(_showThread).toList();
     final fab = app.settings.getString('forumFabFunction', fallback: 'refresh');
     return Scaffold(
       appBar: AppBar(
@@ -120,6 +130,7 @@ class _ForumPageState extends State<ForumPage> {
       body: PagedList<ThreadSummary>(
         key: _list,
         padding: const EdgeInsets.only(bottom: 90),
+        itemKey: (thread) => thread.id,
         load: (page) => app.api.forumThreads(
           widget.name,
           page: page,
@@ -127,18 +138,30 @@ class _ForumPageState extends State<ForumPage> {
           digest: _digest,
         ),
         onLoaded: (result) {
-          if (result.forum != null && mounted) {
-            setState(() => _forum = result.forum);
-            if (!app.changingAccount &&
+          if (mounted) {
+            setState(() {
+              _forum = result.forum ?? _forum;
+              final pins = {
+                if (result.page > 1)
+                  for (final thread in _pinnedThreads) thread.id: thread,
+              };
+              for (final thread in result.items) {
+                if (thread.isPinned) {
+                  pins[thread.id] = thread;
+                } else {
+                  pins.remove(thread.id);
+                }
+              }
+              _pinnedThreads = pins.values.toList();
+            });
+            if (result.forum != null &&
+                !app.changingAccount &&
                 app.session?.userId == _routeAccountId) {
               app.local.recordForum(result.forum!);
             }
           }
         },
-        filter: (thread) =>
-            (!app.local.blocksThread(thread) ||
-                !app.settings.getBool('hideBlockedContent')) &&
-            !(app.settings.blockVideo && thread.videoUrl.isNotEmpty),
+        filter: (thread) => !thread.isPinned && _showThread(thread),
         headerBuilder: (context, result) => Column(
           children: [
             Padding(
@@ -283,6 +306,11 @@ class _ForumPageState extends State<ForumPage> {
                 ],
               ),
             ),
+            if (pinned.isNotEmpty)
+              PinnedThreadList(
+                threads: pinned,
+                onTap: (thread) => openThread(context, thread),
+              ),
           ],
         ),
         itemBuilder: (context, thread, _) => ThreadCard(

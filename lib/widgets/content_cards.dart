@@ -74,6 +74,60 @@ class UserTile extends StatelessWidget {
   );
 }
 
+class PinnedThreadList extends StatelessWidget {
+  const PinnedThreadList({
+    super.key,
+    required this.threads,
+    required this.onTap,
+  });
+  final List<ThreadSummary> threads;
+  final ValueChanged<ThreadSummary> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    return SurfaceCard(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var index = 0; index < threads.length; index++) ...[
+            if (index > 0) const Divider(height: 1, indent: 14, endIndent: 14),
+            BlockedContent(
+              key: ValueKey(threads[index].id),
+              blocked: app.local.blocksThread(threads[index]),
+              child: InkWell(
+                onTap: () => onTap(threads[index]),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        threads[index].title.isEmpty
+                            ? context.l10n.noTitle
+                            : threads[index].title,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class ThreadCard extends StatelessWidget {
   const ThreadCard({
     super.key,
