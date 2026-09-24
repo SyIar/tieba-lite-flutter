@@ -2,7 +2,7 @@
 
 ## 当前边界
 
-`.github/workflows/ios-unsigned.yml` 已在 [run 35998406483](https://github.com/SyIar/tieba-lite-flutter/actions/runs/35998406483) 成功执行。当前 `0.1.0 (4)` 包含登录初始化修复与新默认图标，unsigned IPA 已下载并验证到 `D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`；版本来源、校验值和 iPhone 验收见 [VALIDATION.md](VALIDATION.md)。
+`.github/workflows/ios-unsigned.yml` 已在 [run 36000448866](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36000448866) 成功执行。最新安装包 `0.1.0 (5)` 将首页最近访问移到关注的吧前，并使用最多 5 个不同吧的 FIFO；保留此前登录初始化修复与新默认图标。unsigned IPA 已下载并验证到 `D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`。用户本次要求只打包，未安装到手机；最近一次已确认安装为 `0.1.0 (4)`。版本来源、校验值和 iPhone 验收见 [VALIDATION.md](VALIDATION.md)。
 
 该工作流只通过 Actions 页面手动触发，普通 push 不会触发构建。用户已于 2026-09-24 确认使用公开仓库 [SyIar/tieba-lite-flutter](https://github.com/SyIar/tieba-lite-flutter) 和标准 GitHub-hosted runner；未启用付费 runner 或修改账单设置。
 
