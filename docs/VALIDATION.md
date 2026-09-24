@@ -38,7 +38,7 @@
 - 2026-09-24，Sideloadly 0.60 已通过 `@Wi-Fi` 识别 iOS 27.2 设备，使用现有本地账户签名并安装 `0.1.0 (2)`，最终显示 `Done. / 100%`。
 - 本地安装记录确认 `Tieba Lite` 已登记自动刷新，`one_off=0`、`known_ttl=7`、`refresh_at_hours=96`、`failures_count=0`；daemon 后续检查已识别该 App。
 - 用户随后确认可以正常进入首页，首次真机安装、启动与首页显示通过；真实百度登录及其他业务功能仍须分别确认。账号、设备标识、证书和原始日志未提交到仓库。
-- 20:29:15，`0.1.0 (4)` 在同一 `@Wi-Fi` 连接下覆盖安装完成，Sideloadly 显示 `Done. / 100%`。本地仅有一条有效的 Tieba Lite 自动刷新记录，`one_off=0`、`failures_count=0`，缓存文件标识与新的 IPA 内容匹配；登录页和桌面图标的真机复验待用户反馈。
+- 20:29:15，`0.1.0 (4)` 在同一 `@Wi-Fi` 连接下覆盖安装完成，Sideloadly 显示 `Done. / 100%`。本地仅有一条有效的 Tieba Lite 自动刷新记录，`one_off=0`、`failures_count=0`，缓存文件标识与新的 IPA 内容匹配。用户在登录页和桌面图标复验请求后回复“ok了”，确认本次问题解决；未将此反馈扩大为所有已登录业务的逐项验收。
 
 ## iOS 登录初始化修复
 
@@ -46,12 +46,12 @@
 - 根因：`BaiduWebSessionCoordinator` 无条件调用 `WebStorageManager.deleteAllData()`，但锁定的 iOS 插件没有实现该 Android-only 接口。使用真实 `IOSInAppWebViewPlatform` Dart adapter 的新回归测试复现 `UnimplementedError: deleteAllData is not implemented on the current platform`。
 - 修复：iOS / macOS 使用 `removeDataModifiedSince`、全部 `WebsiteDataType` 与 Unix epoch；Android 保留原接口。清理仍在加载或注入账号 Cookie 前完成，失败时仍阻止会话打开。
 - 测试直接使用已锁定的 iOS Dart adapter，只 mock 原生 method channels；为此将同版本 `flutter_inappwebview_ios 1.1.2` 声明为 dev dependency，没有升级运行时依赖。修复后 2 项新回归与原 5 项 WebView session 测试通过，Dart analyze 无问题。
-- 参考：[插件官方平台用法](https://inappwebview.dev/docs/web-storage-manager/)。修复版云构建、制品校验与 Wi-Fi 覆盖安装已通过，登录页真机复验单独确认。
+- 参考：[插件官方平台用法](https://inappwebview.dev/docs/web-storage-manager/)。修复版云构建、制品校验与 Wi-Fi 覆盖安装已通过，用户已反馈本次登录页问题解决。
 - [运行 35997532834](https://github.com/SyIar/tieba-lite-flutter/actions/runs/35997532834) 已通过 verify job。用户在构建中追加蓝底白色圆润“贴”字图标，故主动取消该次 iOS 构建，并将图标与登录修复合并重建；该取消不作为代码编译失败记录。
 
 ## 待完成的真机验收
 
-- iPhone 上的真实百度登录、Keychain、WebView cookies、相册、媒体、分享、alternate icons、incoming links。
+- 登录后的会话持久化、Keychain、WebView cookies 与账号切换隔离；相册、媒体、分享、alternate icons、incoming links。
 - 登录后的服务端接口与用户主动选择的写操作。
 
 本地 Flutter 测试和 Web 编译不等同于 iOS 编译成功或全部业务验收通过。未执行 Gradle，未新增 Java tests。
