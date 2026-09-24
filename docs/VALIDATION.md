@@ -23,11 +23,16 @@
 - artifact：`TiebaLite-iOS-unsigned-2`，包含 IPA、`SHA256SUMS`、`build-info.json`；GitHub 保存 7 天，本机另留固定副本。
 - 本机文件：`D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`，大小 `24,652,611` bytes。下载后重新检查 ZIP 完整性、device 平台、Runner / App.framework / Flutter.framework 的 arm64、source commit，以及复制前后 SHA-256，全部通过。
 - IPA SHA-256：`52dbf0fce2e8ff84a12a3d5b221a949d944eac77ac6572aa1e82fdcd8885c5f3`。
-- bundle identifier：`org.tblite.flutter.tiebaLite`。本制品未签名，尚未安装到 iPhone；上述成功不代表真机业务验收完成。
+- bundle identifier：`org.tblite.flutter.tiebaLite`。云端制品保持未签名，安装时由 Sideloadly 在本机重新签名；上述构建成功不代表真机业务验收完成。
+
+## Wi-Fi 安装记录
+
+- 2026-09-24，Sideloadly 0.60 已通过 `@Wi-Fi` 识别 iOS 27.2 设备，使用现有本地账户签名并安装 `0.1.0 (2)`，最终显示 `Done. / 100%`。
+- 本地安装记录确认 `Tieba Lite` 已登记自动刷新，`one_off=0`、`known_ttl=7`、`refresh_at_hours=96`、`failures_count=0`；daemon 后续检查已识别该 App。
+- 用户随后确认可以正常进入首页，首次真机安装、启动与首页显示通过；真实百度登录及其他业务功能仍须分别确认。账号、设备标识、证书和原始日志未提交到仓库。
 
 ## 待验证
 
-- Sideloadly 重新签名和 iPhone 安装、启动。
 - iPhone 上的真实百度登录、Keychain、WebView cookies、相册、媒体、分享、alternate icons、incoming links。
 - 登录后的服务端接口与用户主动选择的写操作。
 
