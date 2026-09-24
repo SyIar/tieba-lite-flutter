@@ -5,7 +5,7 @@
 ## 已完成
 
 - `flutter analyze --no-pub`：No issues found。
-- `flutter test --no-pub`：最新 CI 的 65 tests 全部通过，包含 protocol fixtures、账号存储与 WebView session 隔离、iOS 插件初始化回归、启动恢复、登录异常后的导航清理、关注人数缺失与签到状态、分页和楼层定位、历史迁移、最近访问 FIFO、缓存与草稿隔离、图标 channel、avatar crop、emoticons 和 deep link。
+- `flutter test --no-pub`：最新 CI 的 66 tests 全部通过，包含 protocol fixtures、账号存储与 WebView session 隔离、iOS 插件初始化回归、启动恢复、登录异常后的导航清理、关注人数缺失与签到状态、置顶帖分组和分页去重、分页和楼层定位、历史迁移、最近访问 FIFO、缓存与草稿隔离、图标 channel、avatar crop、emoticons 和 deep link。
 - `flutter build web --release --no-pub`：成功；在 402 × 874 预览中确认中文字体、首页、个人页、设置和浅色 / 深色切换，检查时没有前端 error log。
 - `scripts/check_repository.py`：源码语言与本地化 key 检查通过；306 对 EN/ZH ARB keys 对齐。
 - 原生配置静态验证：5 个 plist / entitlements 可解析；57 个 icon catalog 引用尺寸正确且不透明。
@@ -29,7 +29,7 @@
 
 - [运行 35998406483](https://github.com/SyIar/tieba-lite-flutter/actions/runs/35998406483) 成功，source `4c92398a9963306c9e00f76145c5cd375d09a70b`，包含 iOS 登录初始化修复与新的默认蓝底白色圆润“贴”字图标。
 - 58 tests、Dart analyze、Web release、Xcode 26.3 编译、IPA 打包及云端结构校验全部通过。
-- build `4` 安装文件归档：`artifacts/run-35998406483/TiebaLite-unsigned.ipa`，`25,712,323` bytes；固定安装路径现已更新为下述 build `7`。
+- build `4` 安装文件归档：`artifacts/run-35998406483/TiebaLite-unsigned.ipa`，`25,712,323` bytes；固定安装路径现已更新为下述 build `8`。
 - IPA SHA-256：`a1af01aad4f12ee267f62cb8d405cc69f2df8047c55b89f09f532ae4ec1920a5`；本机重复校验 ZIP、device arm64、source commit、build number 和文件复制校验值均通过。
 - 从 IPA 提取主图标并对 Xcode 的 CgBI PNG 做无损解码，120 × 120 RGB 像素与新源图对应尺寸完全一致。图标源图与提示词见 `APP_ICON.md`。
 
@@ -41,13 +41,21 @@
 - SHA-256：`33bd23a96b31f0ca4b7eb75cedfbe21ce8fc29be4fbd6f78a671dd607e51887d`。本机复核 ZIP 完整性、device arm64、bundle identifier、source commit、Flutter revision、build number 与复制前后 SHA-256，全部通过。
 - 按用户要求仅交付 unsigned IPA，没有触发 Sideloadly、手机安装或自动刷新队列更新。最近一次已确认的手机安装和自动刷新缓存仍为 build `4`；新包需要用户回来后再签名安装和验收。
 
-### 最新修复包：0.1.0 (7)，仅打包未安装
+### 关注与签到修复包：0.1.0 (7)，仅打包未安装
 
 - [运行 36002684198](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36002684198) 成功，source `b2a0d944d8dc4e3734824190d37d5a70065c8e35`。包含关注列表统计显示与签到完成态修复，并保留前述 FIFO、登录修复和新图标。
 - 云端 65 tests、Dart analyze、Web release、Xcode `26.3 / 17C529` 编译、IPA 打包与结构校验全部通过。
-- 最新 unsigned IPA：`D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`，`25,713,066` bytes。归档：`artifacts/run-36002684198/`；SHA-256：`dbca8115d66b76c30301142d40716eab3e9e6cb460d58d5258b292aa58480909`。
+- build `7` unsigned IPA：`artifacts/run-36002684198/TiebaLite-unsigned.ipa`，`25,713,066` bytes；同目录保存元数据。SHA-256：`dbca8115d66b76c30301142d40716eab3e9e6cb460d58d5258b292aa58480909`。
 - 下载后在 Windows 复核 ZIP、device arm64、bundle identifier、source commit、Flutter revision、版本 `0.1.0 (7)` 和复制前后 SHA-256，全部通过。没有操作 Sideloadly、执行真实签到或安装手机，真机回归待完成。
 - [运行 36002485999](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36002485999)，build `6`：为纳入“仅实时关注列表显示签到状态”的最终调整主动取消，没有交付 IPA；不记为编译失败。
+
+### 最新安装包：0.1.0 (8)，仅打包未安装
+
+- [运行 36005115695](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36005115695) 成功，source `0c355f5b8cb20d6f5161907bf9f485a3f8695a04`。新增吧内置顶帖单行标题列表，保留前述关注/签到、FIFO、登录修复和新图标。
+- 云端 66 tests、Dart analyze、Web release、Xcode `26.3 / 17C529` 编译、IPA 打包与结构校验全部通过。
+- 最新 unsigned IPA：`D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`，`25,715,557` bytes。归档：`artifacts/run-36005115695/`，同目录保存 `SHA256SUMS` 和 `build-info.json`。
+- SHA-256：`e0f3e56a55fe1eb0b3e58126f3f12635ee18a67332a0763c7036d491cddd6850`。Windows 下载后复核 ZIP、device arm64、bundle identifier、source commit、Flutter revision、版本 `0.1.0 (8)` 与复制前后 SHA-256，全部通过。
+- 本次仅更新安装包，没有操作 Sideloadly、手机安装或自动续签缓存；iPhone 上的最终显示与点击验收待完成。
 
 ## Wi-Fi 安装记录
 
@@ -77,9 +85,17 @@
 - 返回首页时重新读取关注列表，更新其签到状态；修正首页刷新中返回 `Future` 的 `setState` callback 写法。
 - 本地 20 项相关 Flutter 测试与 Dart analyze 通过；新增 1 项协议回归、4 项 widget 回归，覆盖未知/零/非零关注人数、nested sign state、成功与失败、刷新失败、返回首页更新。网络使用合成响应，没有执行真实账号写操作。详情见 `API_MIGRATION.md`。
 
+## 置顶帖紧凑展示
+
+- 吧内置顶帖从普通 `ThreadCard` 中分离，集中为一个 `PinnedThreadList`：每帖单行标题、超长省略、点击进入原帖，去掉作者、摘要、媒体和计数。每行保留至少 44 logical pixels 的点击区域。
+- 列表放在普通帖子前，随页面内容正常滚动，不使用浮层或固定吸顶。多个置顶帖共享一块列表区域，减少首屏占用。
+- 按 thread ID 合并分页重复项，第一页刷新重新建立置顶列表，取消置顶的帖子回到普通卡片；保留屏蔽和视频过滤规则。
+- 本地 10 项相关 Flutter tests 与 Dart analyze 通过；新增回归覆盖多个置顶、分页重复、屏蔽条目和刷新后取消置顶。仓库语言检查通过。
+
 ## 待完成的真机验收
 
 - 关注列表的等级/签到状态，以及吧内签到成功后的“已签到”按钮；本次修复仅生成安装包，没有用真实账号执行签到。
+- 置顶帖单行列表在 iPhone 上的显示和点击；本次继续只打包，不安装。
 - 本次首页最近访问顺序和 FIFO 交互；按用户要求暂不安装新包。
 - 登录后的会话持久化、Keychain、WebView cookies 与账号切换隔离；相册、媒体、分享、alternate icons、incoming links。
 - 登录后的服务端接口与用户主动选择的写操作。
