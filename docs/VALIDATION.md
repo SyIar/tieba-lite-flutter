@@ -33,6 +33,16 @@
 
 ## 待验证
 
+### iOS 登录初始化修复
+
+- build `2` 的真机登录页显示“请求失败”与“重试”，发生在百度 WebView 创建前。
+- 根因：`BaiduWebSessionCoordinator` 无条件调用 `WebStorageManager.deleteAllData()`，但锁定的 iOS 插件没有实现该 Android-only 接口。使用真实 `IOSInAppWebViewPlatform` Dart adapter 的新回归测试复现 `UnimplementedError: deleteAllData is not implemented on the current platform`。
+- 修复：iOS / macOS 使用 `removeDataModifiedSince`、全部 `WebsiteDataType` 与 Unix epoch；Android 保留原接口。清理仍在加载或注入账号 Cookie 前完成，失败时仍阻止会话打开。
+- 测试直接使用已锁定的 iOS Dart adapter，只 mock 原生 method channels；为此将同版本 `flutter_inappwebview_ios 1.1.2` 声明为 dev dependency，没有升级运行时依赖。修复后 2 项新回归与原 5 项 WebView session 测试通过，Dart analyze 无问题。
+- 参考：[插件官方平台用法](https://inappwebview.dev/docs/web-storage-manager/)。云构建、修复版覆盖安装与登录页真机复验待完成。
+
+### 其余真机验收
+
 - iPhone 上的真实百度登录、Keychain、WebView cookies、相册、媒体、分享、alternate icons、incoming links。
 - 登录后的服务端接口与用户主动选择的写操作。
 

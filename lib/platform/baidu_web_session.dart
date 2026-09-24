@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 /// Serializes access to the shared native WebKit cookie store.
@@ -7,7 +8,20 @@ class BaiduWebSessionCoordinator {
   static final instance = BaiduWebSessionCoordinator(
     clearStore: () async {
       await CookieManager.instance().deleteAllCookies();
-      await WebStorageManager.instance().deleteAllData();
+      final storage = WebStorageManager.instance();
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+        case TargetPlatform.macOS:
+          // deleteAllData is Android-only in the plugin's platform contract.
+          await storage.removeDataModifiedSince(
+            dataTypes: WebsiteDataType.values,
+            date: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+          );
+        case TargetPlatform.android:
+          await storage.deleteAllData();
+        default:
+          throw UnsupportedError('Baidu web sessions require a native WebView');
+      }
     },
   );
 
