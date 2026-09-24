@@ -3,7 +3,7 @@
 用户于 2026-09-24 要求默认图标改为蓝底、白色、较圆润的“贴”字。
 
 - 使用内置 `image_gen` 生成新的文字图标，没有复制原版 TiebaLite / 百度贴吧图标。
-- 项目源图：`assets/branding/app-icon.png`。源图保持生成结果，Pillow 仅负责 RGB 格式和各平台尺寸适配。
+- 项目源图：`assets/branding/app-icon.png`，实际输出为 1254 × 1254 RGB；SHA-256 为 `18acefc4d400ef53f8087cda8637f1da856ad3f61db4005378930137313cf78b`。源图保持生成结果，Pillow 仅负责 RGB 格式和各平台尺寸适配，App Store 图标输出为 1024 × 1024。
 - `python scripts/generate_icons.py` 更新默认 iPhone / iPad / App Store 图标及 Web 图标。源图保持方形、不透明，由 iOS 应用圆角遮罩。
 - 既有可选 `AppIconBlue` / `AppIconDark` 保留，默认 `AppIcon` 使用本次新图。
 
