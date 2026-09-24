@@ -443,7 +443,7 @@ class _HomePageState extends State<HomePage> {
                     icon: Icons.forum_outlined,
                   )
                 else
-                  _forumCollection(forums),
+                  _forumCollection(forums, showCheckIn: true),
               ],
             ),
           );
@@ -452,7 +452,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _forumCollection(List<Forum> forums) {
+  Widget _forumCollection(List<Forum> forums, {bool showCheckIn = false}) {
     final app = AppScope.of(context);
     if (app.settings.getBool('listSingle')) {
       return SurfaceCard(
@@ -462,7 +462,7 @@ class _HomePageState extends State<HomePage> {
                 (forum) => ForumTile(
                   forum: forum,
                   onTap: () => _openForum(forum.name),
-                  subtitle: forum.isFollowing
+                  subtitle: showCheckIn
                       ? [
                           if (forum.level > 0) 'Lv.${forum.level}',
                           forum.isSigned
