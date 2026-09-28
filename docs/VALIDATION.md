@@ -2,7 +2,7 @@
 
 ## 当前原生 Swift 版本
 
-`0.2.0 (1009)` 已通过 [macOS CI run 36432092117](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36432092117)：9 项 Swift core 测试、iPhone arm64 Release 编译和 IPA 完整性／资源／无 Flutter runtime 检查。安装包已下载到 `D:\workspace\sideloadly-setup\TiebaLite-0.2.0-1009-unsigned.ipa`，校验值和迁移范围见 [SWIFT_MIGRATION.md](SWIFT_MIGRATION.md)。
+`0.2.0 (1010)` 已通过 [macOS CI run 36434497179](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36434497179)：9 项 Swift core 测试、iPhone arm64 Release 编译和 IPA 完整性／资源／无 Flutter runtime 检查。安装包已下载到 `D:\workspace\sideloadly-setup\TiebaLite-0.2.0-1010-unsigned.ipa`，新增 image/video 左边缘滑动返回；校验值和迁移范围见 [SWIFT_MIGRATION.md](SWIFT_MIGRATION.md)。手势交互仍待用户真机验收，未运行模拟器。
 
 按用户要求，最终流程不运行模拟器校验，由用户真机测试。当前原生版本尚未安装验收；下面保留的旧 Flutter 记录不代表 Swift 版本已经通过相同验收。
 
