@@ -1,0 +1,61 @@
+name: TiebaLite
+options:
+  deploymentTarget:
+    iOS: '26.0'
+packages:
+  SwiftProtobuf:
+    url: https://github.com/apple/swift-protobuf.git
+    exactVersion: 1.38.1
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    TARGETED_DEVICE_FAMILY: '1,2'
+    CODE_SIGNING_ALLOWED: NO
+    MARKETING_VERSION: '0.2.0'
+    CURRENT_PROJECT_VERSION: '1001'
+targets:
+  TiebaLite:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - Core
+      - path: ../ios/Runner/Assets.xcassets
+        buildPhase: resources
+      - path: ../lib/l10n/app_zh.arb
+        buildPhase: resources
+      - path: ../lib/l10n/app_en.arb
+        buildPhase: resources
+      - path: ../assets/l10n/emoticons_zh.arb
+        buildPhase: resources
+      - path: ../assets/emoticons
+        type: folder
+        buildPhase: resources
+      - path: ../LICENSE
+        buildPhase: resources
+      - path: ../THIRD_PARTY_NOTICES.md
+        buildPhase: resources
+    dependencies:
+      - package: SwiftProtobuf
+    info:
+      path: build/Info.plist
+      properties:
+        CFBundleDisplayName: Tieba Lite
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        CADisableMinimumFrameDurationOnPhone: true
+        NSPhotoLibraryAddUsageDescription: Save selected images to your photo library.
+        CFBundleURLTypes:
+          - CFBundleURLName: org.tblite.flutter.tiebaLite
+            CFBundleURLSchemes: [tblite]
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.tblite.flutter.tiebaLite
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+schemes:
+  TiebaLite:
+    build:
+      targets:
+        TiebaLite: all

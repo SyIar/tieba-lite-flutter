@@ -57,3 +57,7 @@ artifacts/
 .env*
 __pycache__/
 *.pyc
+native/build/
+native/*.xcodeproj/
+native/Core/Generated/
+native/Core/ProtoCodec.swift
