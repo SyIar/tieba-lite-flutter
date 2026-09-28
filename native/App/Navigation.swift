@@ -7,6 +7,7 @@ enum Route: Hashable {
     let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
     func value(_ key: String) -> String { query.first { $0.name == key }?.value ?? "" }
     let parts = url.pathComponents.filter { $0 != "/" }
+    if url.scheme == "tblite", url.host == "user", !value("uid").isEmpty { return .user(value("uid")) }
     let id = parts.count > 1 && parts[0] == "p" ? parts[1] : value("tid")
     if !id.isEmpty, id.allSatisfy(\.isNumber) { return .thread(id, value("pid"), max(1, Int(value("pn")) ?? 1), false) }
     let name = value("kw").isEmpty ? value("fname") : value("kw")
@@ -32,6 +33,12 @@ struct AppRoot: View {
       } else { ContentUnavailableView(tr("initializationFailed"), systemImage: "exclamationmark.lock", description: Text(app.error ?? "")).overlay(alignment: .bottom) { Button(tr("retry")) { app.initialize() }.padding() } }
     }
     .tint(settings.accent).preferredColorScheme(settings.scheme)
+    .scrollContentBackground(settings.text("nativeBackground").isEmpty ? .visible : .hidden)
+    .background {
+      if let file = DraftFiles.restore(settings.text("nativeBackground")), let image = UIImage(contentsOfFile: file.path) {
+        Image(uiImage: image).resizable().scaledToFill().blur(radius: settings.number("translucentBackgroundBlur")).overlay(Color(uiColor: .systemBackground).opacity(settings.number("nativeSurfaceOpacity") == 0 ? 0.9 : settings.number("nativeSurfaceOpacity"))).ignoresSafeArea()
+      }
+    }
     .font(.system(size: 16 * settings.fontScale))
     .overlay { if validating { ProgressView(tr("loading")).padding(24).glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20)) } }
     .sheet(isPresented: $app.login) {
