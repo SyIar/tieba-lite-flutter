@@ -47,6 +47,7 @@ class _MainShellState extends State<MainShell> {
       });
     }
     return Scaffold(
+      extendBody: usesNativeGlass,
       body: PageView(
         controller: _pages,
         physics: settings.getBool('homePageScroll')
@@ -55,37 +56,66 @@ class _MainShellState extends State<MainShell> {
         onPageChanged: (index) => setState(() => _tab = index),
         children: tabs.map((tab) => _RetainedTab(child: tab)).toList(),
       ),
-      bottomNavigationBar: GlassBottomBar(
-        padding: EdgeInsets.zero,
-        child: NavigationBar(
+      bottomNavigationBar: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+        child: NativeGlassControl(
+          kind: 'tabs',
           selectedIndex: selected,
-          onDestinationSelected: (index) {
-            setState(() => _tab = index);
-            _pages.jumpToPage(index);
-          },
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.grid_view_outlined),
-              selectedIcon: const Icon(Icons.grid_view_rounded),
-              label: context.l10n.home,
-            ),
-            if (!hidden)
-              NavigationDestination(
-                icon: const Icon(Icons.explore_outlined),
-                selectedIcon: const Icon(Icons.explore_rounded),
-                label: context.l10n.explore,
+          height: 66,
+          actions: [
+            for (final item in [
+              ('home', context.l10n.home, 'square.grid.2x2'),
+              if (!hidden) ('explore', context.l10n.explore, 'safari'),
+              (
+                'notifications',
+                context.l10n.notifications,
+                'bubble.left.and.bubble.right',
               ),
-            NavigationDestination(
-              icon: const Icon(Icons.chat_bubble_outline_rounded),
-              selectedIcon: const Icon(Icons.chat_bubble_rounded),
-              label: context.l10n.notifications,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline_rounded),
-              selectedIcon: const Icon(Icons.person_rounded),
-              label: context.l10n.me,
-            ),
+              ('me', context.l10n.me, 'person.crop.circle'),
+            ].indexed)
+              NativeGlassAction(
+                id: item.$2.$1,
+                label: item.$2.$2,
+                symbol: item.$2.$3,
+                onPressed: () {
+                  setState(() => _tab = item.$1);
+                  _pages.jumpToPage(item.$1);
+                },
+              ),
           ],
+          fallback: GlassSurface(
+            child: NavigationBar(
+              selectedIndex: selected,
+              onDestinationSelected: (index) {
+                setState(() => _tab = index);
+                _pages.jumpToPage(index);
+              },
+              destinations: [
+                NavigationDestination(
+                  icon: const Icon(Icons.grid_view_outlined),
+                  selectedIcon: const Icon(Icons.grid_view_rounded),
+                  label: context.l10n.home,
+                ),
+                if (!hidden)
+                  NavigationDestination(
+                    icon: const Icon(Icons.explore_outlined),
+                    selectedIcon: const Icon(Icons.explore_rounded),
+                    label: context.l10n.explore,
+                  ),
+                NavigationDestination(
+                  icon: const Icon(Icons.chat_bubble_outline_rounded),
+                  selectedIcon: const Icon(Icons.chat_bubble_rounded),
+                  label: context.l10n.notifications,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.person_outline_rounded),
+                  selectedIcon: const Icon(Icons.person_rounded),
+                  label: context.l10n.me,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -274,6 +304,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
+      extendBodyBehindAppBar: usesNativeGlass,
       appBar: GlassAppBar(
         title: Text(context.l10n.appTitle),
         actions: [
@@ -332,7 +363,10 @@ class _HomePageState extends State<HomePage> {
             onRefresh: _refresh,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 28),
+              padding: EdgeInsets.only(
+                top: MediaQuery.paddingOf(context).top,
+                bottom: 28 + MediaQuery.paddingOf(context).bottom,
+              ),
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),

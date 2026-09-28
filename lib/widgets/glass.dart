@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../platform/glass_accessibility.dart';
+import 'native_glass.dart';
+export 'native_glass.dart';
 
 /// A bounded glass layer for controls; long reading surfaces stay unfiltered.
 class GlassSurface extends StatelessWidget {
@@ -187,19 +189,39 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         titleSpacing: titleSpacing ?? 14,
         leadingWidth: 60,
         automaticallyImplyLeading: automaticallyImplyLeading,
-        leading: leading == null ? null : Center(child: leading),
+        leading: leading == null
+            ? (usesNativeGlass &&
+                      automaticallyImplyLeading &&
+                      Navigator.canPop(context)
+                  ? Center(
+                      child: nativeGlassButton(
+                        context,
+                        IconButton(
+                          tooltip: MaterialLocalizations.of(context)
+                              .backButtonTooltip,
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.maybePop(context),
+                        ),
+                      ),
+                    )
+                  : null)
+            : Center(child: nativeGlassButton(context, leading!)),
         actions: actions == null
             ? null
             : [
                 for (final action in actions!)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: Center(child: action),
+                    child: Center(child: nativeGlassButton(context, action)),
                   ),
                 const SizedBox(width: 9),
               ],
         bottom: bottom,
-        backgroundColor: backgroundColor ?? theme.appBarTheme.backgroundColor,
+        backgroundColor:
+            backgroundColor ??
+            (usesNativeGlass
+                ? Colors.transparent
+                : theme.appBarTheme.backgroundColor),
         foregroundColor: foregroundColor,
         systemOverlayStyle: darkMedia ? SystemUiOverlayStyle.light : null,
       ),
@@ -228,7 +250,158 @@ class GlassFloatingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox.square(
     dimension: small ? 48 : 56,
-    child: IconButton(onPressed: onPressed, tooltip: tooltip, icon: child),
+    child: nativeGlassButton(
+      context,
+      IconButton(onPressed: onPressed, tooltip: tooltip, icon: child),
+    ),
+  );
+}
+
+/// Convert navigation actions, not repeated content-row controls.
+Widget nativeGlassButton(BuildContext context, Widget source) {
+  if (!usesNativeGlass) return source;
+  NativeGlassAction? action;
+  if (source is IconButton && source.icon is Icon) {
+    final symbol = _symbol((source.icon as Icon).icon);
+    if (symbol == null) return source;
+    action = NativeGlassAction(
+      id: 'press',
+      label: source.tooltip ?? symbol,
+      symbol: symbol,
+      selected: source.isSelected ?? false,
+      onPressed: source.onPressed,
+    );
+  } else if (source is PopupMenuButton<String>) {
+    final entries = source.itemBuilder(context);
+    if (!source.enabled ||
+        source.onOpened != null ||
+        source.onCanceled != null ||
+        entries.any(
+          (entry) =>
+              entry is! PopupMenuItem<String> ||
+              entry.child is! Text ||
+              entry.value == null,
+        )) {
+      return source;
+    }
+    action = NativeGlassAction(
+      id: 'menu',
+      label:
+          source.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
+      symbol: 'ellipsis',
+      menu: [
+        for (final entry in entries.cast<PopupMenuItem<String>>())
+          NativeGlassAction(
+            id: entry.value!,
+            label: (entry.child as Text).data ?? '',
+            symbol: '',
+            destructive: entry.value == 'delete',
+            selected: entry is CheckedPopupMenuItem<String> && entry.checked,
+            onPressed: !source.enabled || !entry.enabled
+                ? null
+                : () {
+                    entry.onTap?.call();
+                    source.onSelected?.call(entry.value!);
+                  },
+          ),
+      ],
+    );
+  }
+  if (action == null) return source;
+  return SizedBox(
+    width: 46,
+    height: 46,
+    child: NativeGlassControl(
+      kind: 'button',
+      actions: [action],
+      height: 46,
+      fallback: source,
+    ),
+  );
+}
+
+String? _symbol(IconData? icon) {
+  const symbols = <String, List<IconData>>{
+    'chevron.backward': [
+      Icons.arrow_back,
+      Icons.arrow_back_ios,
+      Icons.chevron_left,
+    ],
+    'magnifyingglass': [Icons.search, Icons.search_rounded],
+    'plus': [Icons.add, Icons.add_rounded],
+    'link': [Icons.link, Icons.link_rounded],
+    'arrow.clockwise': [Icons.refresh, Icons.refresh_rounded],
+    'xmark': [Icons.close, Icons.close_rounded],
+    'checkmark': [
+      Icons.check,
+      Icons.check_rounded,
+      Icons.done,
+      Icons.done_rounded,
+    ],
+    'square.and.arrow.up': [Icons.share, Icons.share_rounded, Icons.ios_share],
+    'square.and.pencil': [Icons.edit, Icons.edit_rounded, Icons.edit_outlined],
+    'person.crop.circle': [Icons.manage_accounts_outlined],
+    'bubble.left.and.bubble.right': [Icons.forum_outlined],
+    'arrow.up': [Icons.arrow_upward, Icons.arrow_upward_rounded],
+    'bookmark': [Icons.bookmark_border_rounded, Icons.bookmark_border],
+    'bookmark.fill': [Icons.bookmark_rounded, Icons.bookmark],
+    'gearshape': [
+      Icons.settings,
+      Icons.settings_rounded,
+      Icons.settings_outlined,
+    ],
+  };
+  for (final entry in symbols.entries) {
+    if (entry.value.contains(icon)) return entry.key;
+  }
+  return null;
+}
+
+class GlassActionBar extends StatelessWidget {
+  const GlassActionBar({super.key, required this.actions});
+  final List<NativeGlassAction> actions;
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    top: false,
+    minimum: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+    child: NativeGlassControl(
+      kind: 'toolbar',
+      actions: actions,
+      height: ui.lerpDouble(
+        56,
+        88,
+        ((MediaQuery.textScalerOf(context).scale(16) / 16 - 1) / 2).clamp(0, 1),
+      )!,
+      fallback: GlassSurface(
+        child: Row(
+          children: [
+            for (final action in actions)
+              if (action.showLabel)
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: action.onPressed,
+                    icon: const Icon(Icons.edit_outlined),
+                    label: Text(action.label),
+                  ),
+                )
+              else
+                IconButton(
+                  tooltip: action.label,
+                  onPressed: action.onPressed,
+                  icon: Icon(
+                    action.symbol.startsWith('hand.thumbsup')
+                        ? (action.selected
+                              ? Icons.thumb_up_rounded
+                              : Icons.thumb_up_outlined)
+                        : (action.selected
+                              ? Icons.bookmark_rounded
+                              : Icons.bookmark_border_rounded),
+                  ),
+                ),
+          ],
+        ),
+      ),
+    ),
   );
 }
 

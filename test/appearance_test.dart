@@ -20,6 +20,7 @@ import 'package:tieba_lite/platform/glass_accessibility.dart';
 import 'package:tieba_lite/theme/app_theme.dart';
 import 'package:tieba_lite/widgets/common.dart';
 import 'package:tieba_lite/widgets/emoticons.dart';
+import 'package:tieba_lite/widgets/paged_list.dart';
 
 void main() {
   late AppController app;
@@ -64,6 +65,78 @@ void main() {
         home: child,
       ),
     ),
+  );
+
+  testWidgets(
+    'native reader clears both floating bars at large text and scrolls back',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 750);
+      tester.view.devicePixelRatio = 1;
+      tester.view.padding = const FakeViewPadding(top: 24, bottom: 34);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPadding);
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform_views,
+        (_) async => null,
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform_views,
+          null,
+        ),
+      );
+      await tester.pumpWidget(
+        host(
+          Scaffold(
+            extendBody: true,
+            extendBodyBehindAppBar: true,
+            appBar: const GlassAppBar(title: Text('Thread')),
+            body: PagedList<int>(
+              load: (_) async => PageResult(items: List.generate(20, (i) => i)),
+              itemBuilder: (_, item, _) => SizedBox(
+                key: ValueKey('row-$item'),
+                height: 100,
+                child: Text('Row $item'),
+              ),
+            ),
+            bottomNavigationBar: GlassActionBar(
+              actions: [
+                NativeGlassAction(
+                  id: 'reply',
+                  label: 'Reply',
+                  symbol: 'square.and.pencil',
+                  showLabel: true,
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+          scale: 2,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester.getRect(find.byKey(const ValueKey('row-0'))).top,
+        greaterThanOrEqualTo(tester.getRect(find.byType(AppBar)).bottom),
+      );
+      final controller = tester
+          .widget<ListView>(find.byType(ListView))
+          .controller!;
+      controller.jumpTo(controller.position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      controller.jumpTo(controller.position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      final last = tester.getRect(find.byKey(const ValueKey('row-19')));
+      final bar = tester.getRect(find.byType(GlassActionBar));
+      expect(last.bottom, lessThan(bar.top));
+      final before = controller.offset;
+      await tester.dragFrom(const Offset(160, 300), const Offset(0, 230));
+      await tester.pumpAndSettle();
+      expect(controller.offset, lessThan(before));
+      expect(tester.takeException(), isNull);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );
 
   test('appearance upgrade runs once and preserves later choices', () async {

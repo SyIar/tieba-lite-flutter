@@ -203,6 +203,8 @@ class _ThreadPageState extends State<ThreadPage> {
     final app = AppScope.of(context);
     final thread = _thread;
     return Scaffold(
+      extendBody: usesNativeGlass,
+      extendBodyBehindAppBar: usesNativeGlass,
       appBar: GlassAppBar(
         title: GestureDetector(
           onTap: _forum?.name.isNotEmpty == true
@@ -429,44 +431,32 @@ class _ThreadPageState extends State<ThreadPage> {
       ),
       bottomNavigationBar: _reader
           ? null
-          : GlassBottomBar(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton.tonalIcon(
-                        onPressed: () => _reply(),
-                        icon: const Icon(Icons.edit_outlined, size: 18),
-                        label: Text(context.l10n.reply),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    IconButton(
-                      onPressed: _busy ? null : _toggleLike,
-                      tooltip: context.l10n.like,
-                      icon: Icon(
-                        _liked
-                            ? Icons.thumb_up_rounded
-                            : Icons.thumb_up_outlined,
-                        color: _liked ? context.colors.primary : null,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: _busy ? null : () => _toggleSaved(),
-                      tooltip: _saved
-                          ? context.l10n.unsavePost
-                          : context.l10n.savePost,
-                      icon: Icon(
-                        _saved
-                            ? Icons.bookmark_rounded
-                            : Icons.bookmark_border_rounded,
-                        color: _saved ? context.colors.primary : null,
-                      ),
-                    ),
-                  ],
+          : GlassActionBar(
+              actions: [
+                NativeGlassAction(
+                  id: 'reply',
+                  label: context.l10n.reply,
+                  symbol: 'square.and.pencil',
+                  showLabel: true,
+                  onPressed: () => _reply(),
                 ),
-              ),
+                NativeGlassAction(
+                  id: 'like',
+                  label: context.l10n.like,
+                  symbol: _liked ? 'hand.thumbsup.fill' : 'hand.thumbsup',
+                  selected: _liked,
+                  onPressed: _busy ? null : _toggleLike,
+                ),
+                NativeGlassAction(
+                  id: 'save',
+                  label: _saved
+                      ? context.l10n.unsavePost
+                      : context.l10n.savePost,
+                  symbol: _saved ? 'bookmark.fill' : 'bookmark',
+                  selected: _saved,
+                  onPressed: _busy ? null : () => _toggleSaved(),
+                ),
+              ],
             ),
     );
   }
@@ -827,6 +817,8 @@ class _FloorRepliesPageState extends State<FloorRepliesPage> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
+      extendBody: usesNativeGlass,
+      extendBodyBehindAppBar: usesNativeGlass,
       appBar: GlassAppBar(title: Text(context.l10n.floorReplies)),
       body: PagedList<Post>(
         key: _list,
@@ -852,15 +844,16 @@ class _FloorRepliesPageState extends State<FloorRepliesPage> {
           onReply: () => _reply(post),
         ),
       ),
-      bottomNavigationBar: GlassBottomBar(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: FilledButton.icon(
+      bottomNavigationBar: GlassActionBar(
+        actions: [
+          NativeGlassAction(
+            id: 'reply',
+            label: context.l10n.reply,
+            symbol: 'square.and.pencil',
+            showLabel: true,
             onPressed: _reply,
-            icon: const Icon(Icons.edit_outlined),
-            label: Text(context.l10n.reply),
           ),
-        ),
+        ],
       ),
     );
   }

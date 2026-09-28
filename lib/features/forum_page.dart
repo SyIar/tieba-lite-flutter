@@ -79,6 +79,7 @@ class _ForumPageState extends State<ForumPage> {
     final pinned = _pinnedThreads.where(_showThread).toList();
     final fab = app.settings.getString('forumFabFunction', fallback: 'refresh');
     return Scaffold(
+      extendBodyBehindAppBar: usesNativeGlass,
       appBar: GlassAppBar(
         title: Text(widget.name),
         actions: [

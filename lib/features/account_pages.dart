@@ -36,7 +36,9 @@ class MePage extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 32),
+        padding: EdgeInsets.only(
+          bottom: 32 + MediaQuery.paddingOf(context).bottom,
+        ),
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),

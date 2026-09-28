@@ -16,6 +16,11 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    let glassRegistrar = engineBridge.applicationRegistrar
+    glassRegistrar.register(
+      NativeGlassFactory(messenger: glassRegistrar.messenger(), prefix: "org.tblite.flutter"),
+      withId: "org.tblite.flutter/glass"
+    )
     let channel = FlutterMethodChannel(
       name: "org.tblite.flutter/app_icons",
       binaryMessenger: engineBridge.applicationRegistrar.messenger()

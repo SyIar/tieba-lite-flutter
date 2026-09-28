@@ -194,7 +194,12 @@ class PagedListState<T> extends State<PagedList<T>> {
         key: _viewport,
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: widget.padding,
+        padding:
+            widget.padding +
+            EdgeInsets.only(
+              top: MediaQuery.paddingOf(context).top,
+              bottom: MediaQuery.paddingOf(context).bottom,
+            ),
         itemCount: visible.length + 2,
         itemBuilder: (context, index) {
           if (index == 0) {
