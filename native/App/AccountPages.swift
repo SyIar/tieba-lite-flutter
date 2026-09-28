@@ -18,7 +18,7 @@ struct MeView: View {
         if let session = app.session { NavigationLink(tr("myPosts"), value: Route.collection("posts:" + session.userID)); NavigationLink(tr("myForums"), value: Route.collection("forums:" + session.userID)) }
       }
       Section {
-        NavigationLink(value: Route.settings) { Label(tr("settings"), systemImage: "gearshape") }
+        NavigationLink(value: Route.settings) { Label(tr("settings"), systemImage: "gearshape") }.accessibilityIdentifier("settings.open")
         Button(tr("serviceCenter"), systemImage: "questionmark.circle") { app.requireLogin { service = true } }
       }
     }.navigationTitle(tr("me")).sheet(isPresented: $service) { BaiduBrowser(session: app.session, url: URL(string: "https://tieba.baidu.com/mo/q/hybrid-main-service/uegServiceCenter")!) { result in service = false; if case .failure(let error) = result { app.error = error.localizedDescription } }.ignoresSafeArea() }
@@ -146,7 +146,7 @@ struct ProfileEditor: View {
         if let error { Text(error).foregroundStyle(.red) }
         if uncertain { Button(tr("refresh")) { saved() } }
         if busy { ProgressView(tr("sending")) }
-      }.disabled(busy || uncertain).navigationTitle(tr("editProfile"))
+      }.disabled(busy).navigationTitle(tr("editProfile"))
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button(tr("cancel")) { dismiss() }.disabled(busy) }; ToolbarItem(placement: .confirmationAction) { Button(tr("save")) { Task { await save() } }.disabled(busy || uncertain || name.trimmingCharacters(in: .whitespaces).isEmpty) } }
         .task { guard !initialized else { return }; initialized = true; name = profile.name; intro = profile.intro; sex = integer(profile.raw["sex"]) }
         .onChange(of: item) { _, item in Task { if let bytes = try? await item?.loadTransferable(type: Data.self), let image = UIImage(data: bytes) { crop = image } } }

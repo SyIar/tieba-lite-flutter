@@ -59,6 +59,7 @@ struct ForumView: View {
   @EnvironmentObject private var app: AppState
   @EnvironmentObject private var settings: Preferences
   @State private var result = PageResult<ThreadSummary>()
+  @State private var pinned: [ThreadSummary] = []
   @State private var page = 1
   @State private var digest = false
   @State private var sort = 0
@@ -86,9 +87,8 @@ struct ForumView: View {
             }
           }
         }
-        let pinned = result.items.filter(\.pinned)
         if !pinned.isEmpty { Section { ForEach(pinned) { item in
-          if !app.library.blocked(user: item.author, thread: item.id, text: item.title) { NavigationLink(value: Route.thread(item.id, "", 1, false)) { Label(item.title, systemImage: "pin.fill").font(.subheadline).lineLimit(1) } }
+          if !(settings.flag("blockVideo") && item.video != nil) && !app.library.blocked(user: item.author, forum: name, thread: item.id, text: item.title, extraText: item.excerpt) { NavigationLink(value: Route.thread(item.id, "", 1, false)) { Label(item.title, systemImage: "pin.fill").font(.subheadline).lineLimit(1) } }
         } } }
         Section { ForEach(result.items.filter { !$0.pinned }) { ThreadCard(thread: $0) }; LoadState(loading: loading, error: error, empty: result.items.isEmpty) { request = UUID() } }
       }.navigationTitle(name).navigationBarTitleDisplayMode(.inline)
@@ -113,7 +113,14 @@ struct ForumView: View {
   private func perform(_ body: @escaping () async throws -> Void) { app.requireLogin { Task { @MainActor in action = true; defer { action = false }; do { try await body() } catch { app.error = error.localizedDescription } } } }
   private func load() async {
     let expected = request; loading = true; error = nil
-    do { let data = try await app.api.forum(name, page: page, sort: sort, digest: digest); guard !Task.isCancelled, request == expected else { return }; result = data
+    do { var data = try await app.api.forum(name, page: page, sort: sort, digest: digest); guard !Task.isCancelled, request == expected else { return }
+      var seen = Set<String>()
+      data.items = data.items.filter { seen.insert($0.id).inserted }
+      var retained = page == 1 ? [] : pinned
+      let incoming = Set(data.items.map(\.id))
+      retained.removeAll { incoming.contains($0.id) }
+      retained.append(contentsOf: data.items.filter(\.pinned))
+      pinned = retained; result = data
       if let forum = data.forum { signed = signed || forum.signed; app.updateLibrary { $0.visit(forum) } }
     } catch { if !Task.isCancelled { self.error = error.localizedDescription } }
     if expected == request { loading = false }

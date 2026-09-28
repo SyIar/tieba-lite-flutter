@@ -15,6 +15,9 @@ binary = (app / info['CFBundleExecutable']).read_bytes()
 assert struct.unpack('<II', binary[:8]) == (0xFEEDFACF, 0x0100000C), 'Expected arm64 Mach-O'
 assert not any(p.name in {'Flutter.framework', 'App.framework', 'flutter_assets'} for p in app.rglob('*')), 'Unexpected Flutter runtime'
 assert (app / 'app_zh.arb').is_file(), 'Missing Chinese localization'
+assert (app / 'Assets.car').is_file() and info.get('CFBundleIcons'), 'Missing app icon'
+assert (app / 'emoticons').is_dir(), 'Missing emoticon assets'
+assert info['CFBundleURLTypes'][0]['CFBundleURLSchemes'] == ['tblite'], 'Missing deep links'
 output = Path('artifacts/native')
 output.mkdir(parents=True, exist_ok=True)
 ipa = output / 'TiebaLite-unsigned.ipa'

@@ -60,7 +60,7 @@ struct SettingsView: View {
         Link(tr("upstreamProject"), destination: URL(string: "https://github.com/HuanCheng65/TiebaLite")!)
         NavigationLink(tr("licenses")) { LicenseView() }
       }
-    }.navigationTitle(tr("settings")).task { cacheSize = PictureCache.shared.bytes; appIcon = UIApplication.shared.alternateIconName == "AppIconBlue" ? "blue" : UIApplication.shared.alternateIconName == "AppIconDark" ? "dark" : "default" }
+    }.accessibilityIdentifier("settings.form").navigationTitle(tr("settings")).task { cacheSize = PictureCache.shared.bytes; appIcon = UIApplication.shared.alternateIconName == "AppIconBlue" ? "blue" : UIApplication.shared.alternateIconName == "AppIconDark" ? "dark" : "default" }
       .onChange(of: appIcon) { _, choice in
         let name = choice == "blue" ? "AppIconBlue" : choice == "dark" ? "AppIconDark" : nil
         guard UIApplication.shared.alternateIconName != name else { return }

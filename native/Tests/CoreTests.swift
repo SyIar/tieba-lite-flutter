@@ -39,6 +39,15 @@ final class CoreTests: XCTestCase {
     XCTAssertThrowsError(try LocalLibrary.load(account: nil, defaults: defaults))
     XCTAssertEqual(defaults.string(forKey: LocalLibrary.key(account: nil)), "invalid")
   }
+  func testLegacyRecentForumsMigrateWithoutInventingDates() throws {
+    let defaults = UserDefaults(suiteName: "TiebaCoreTests.\(UUID())")!
+    let old = LocalLibrary(document: ["version": 1, "history": [], "pins": [], "search": [], "blocks": [], "drafts": [], "recentForums": [["id": "1", "name": "Original"]]])
+    try old.save(account: nil, defaults: defaults)
+    let migrated = try LocalLibrary.load(account: nil, defaults: defaults)
+    XCTAssertEqual(migrated.rows("forumHistory").count, 1)
+    XCTAssertEqual(Forum(raw: object(migrated.rows("forumHistory")[0]["forum"])).name, "Original")
+    XCTAssertNil(migrated.rows("forumHistory")[0]["visitedAt"])
+  }
   func testUnknownMemberCountAndCheckIn() {
     var forum = Forum(raw: ["id": "1", "name": "Example"])
     XCTAssertNil(forum.members)

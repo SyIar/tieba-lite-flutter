@@ -40,6 +40,14 @@ targets:
     info:
       path: build/Info.plist
       properties:
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: APPL
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en
+        LSRequiresIPhoneOS: true
         CFBundleDisplayName: Tieba Lite
         UILaunchScreen: {}
         UIApplicationSceneManifest:
@@ -55,8 +63,20 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: org.tblite.flutter.tiebaLite
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIconBlue AppIconDark
+  TiebaLiteUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: TiebaLite
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.tblite.native.uitests
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   TiebaLite:
     build:
       targets:
         TiebaLite: all
+    test:
+      targets: [TiebaLiteUITests]

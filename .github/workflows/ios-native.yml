@@ -34,10 +34,20 @@ jobs:
         run: xcodebuild -project native/TiebaLite.xcodeproj -scheme TiebaLite -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath native/build CODE_SIGNING_ALLOWED=NO CURRENT_PROJECT_VERSION=$((1000 + GITHUB_RUN_NUMBER)) build
       - if: ${{ !inputs.core_only }}
         run: python3 scripts/package_native.py
+      - name: Verify native launch and settings navigation
+        if: ${{ !inputs.core_only }}
+        run: python3 scripts/smoke_native.py
       - if: ${{ !inputs.core_only }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: TiebaLite-native-unsigned-${{ github.run_number }}
           path: artifacts/native/
           if-no-files-found: error
+          retention-days: 14
+      - if: ${{ always() && !inputs.core_only }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: TiebaLite-native-ui-${{ github.run_number }}
+          path: artifacts/native-ui/
+          if-no-files-found: ignore
           retention-days: 14

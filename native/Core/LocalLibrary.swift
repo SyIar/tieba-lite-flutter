@@ -13,8 +13,12 @@ struct LocalLibrary {
       return Self(document: ["version": 1, "history": [], "pins": [], "search": [], "blocks": [], "drafts": [], "recentForums": [], "forumHistory": []])
     }
     guard let bytes = stored.data(using: .utf8), let value = try? JSONSerialization.jsonObject(with: bytes) as? JSON, integer(value["version"]) == 1,
-          ["history", "pins", "search", "blocks", "drafts"].allSatisfy({ value[$0] is [Any] }) else { throw APIError(message: "Local data could not be read. It has been preserved.") }
-    return Self(document: value)
+          ["history", "pins", "search", "blocks", "drafts"].allSatisfy({ value[$0] is [Any] }),
+          ["recentForums", "forumHistory"].allSatisfy({ value[$0] == nil || value[$0] is [Any] }) else { throw APIError(message: "Local data could not be read. It has been preserved.") }
+    var migrated = value
+    if migrated["forumHistory"] == nil { migrated["forumHistory"] = records(value["recentForums"]).map { ["forum": $0] } }
+    migrated["recentForums"] = Array(records(value["recentForums"]).prefix(5))
+    return Self(document: migrated)
   }
   func save(account: String?, defaults: UserDefaults = .standard) throws {
     let bytes = try JSONSerialization.data(withJSONObject: document, options: [.sortedKeys])
