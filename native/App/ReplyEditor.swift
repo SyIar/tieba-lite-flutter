@@ -54,6 +54,7 @@ struct ReplyEditor: View {
   @State private var leaving = false
   @State private var completed = false
   @State private var emoticons = false
+  @State private var failure: String?
   private var key: String { string(context.restored?["key"]).isEmpty ? context.id : string(context.restored?["key"]) }
   var body: some View {
     NavigationStack {
@@ -92,7 +93,7 @@ struct ReplyEditor: View {
         .onChange(of: picked) { _, selection in Task { @MainActor in
           importing = true; defer { importing = false; picked = [] }
           do { for item in selection { if attachments.count >= 9 { break }; if let data = try await item.loadTransferable(type: Data.self) { let file = try DraftFiles.retain(data); if !attachments.contains(file) { attachments.append(file) } } } }
-          catch { app.error = error.localizedDescription }
+          catch { failure = error.localizedDescription }
         } }
         .sheet(isPresented: $emoticons) {
           NavigationStack {
@@ -105,7 +106,7 @@ struct ReplyEditor: View {
             }.padding() }.navigationTitle(tr("emoticons")).toolbar { ToolbarItem(placement: .confirmationAction) { Button(tr("done")) { emoticons = false } } }
           }.presentationDetents([.medium, .large])
         }
-    }
+    }.alert(tr("operationFailed"), isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) { Button(tr("done")) { failure = nil } } message: { Text(failure ?? "") }
   }
   private func save() {
     guard !completed, account == app.activeID else { return }
@@ -133,7 +134,7 @@ struct ReplyEditor: View {
       UserDefaults.standard.set(true, forKey: DraftFiles.sentKey(account: account, draft: key))
       if account == app.activeID { app.updateLibrary { $0.removeDraft(key) } }
       sent()
-    } catch { app.error = error.localizedDescription }
+    } catch { failure = error.localizedDescription }
   }
 }
 

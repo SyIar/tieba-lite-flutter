@@ -3,6 +3,24 @@ import XCTest
 @testable import TiebaCore
 
 final class CoreTests: XCTestCase {
+  func testLegacyDartProtobufWireCompatibility() throws {
+    func fixture(_ name: String) throws -> Data { try Data(contentsOf: Bundle.module.url(forResource: name, withExtension: nil, subdirectory: "Fixtures")!) }
+    XCTAssertEqual(try ProtoCodec.encode("PbPage", json: fixture("anchor-request.json")), try fixture("anchor-request.bin"))
+    let response = normalized(try ProtoCodec.decode("PbPage", bytes: fixture("anchor-response.bin")))
+    let data = object(response["data"])
+    XCTAssertEqual(integer(object(data["page"])["current_page"]), 7)
+    XCTAssertFalse(boolean(object(data["page"])["has_more"]))
+    let user = records(data["user_list"])[0]
+    let post = Post(records(data["post_list"])[0], threadID: "123", users: ["42": user])
+    XCTAssertEqual(post.author.name, "Author")
+    XCTAssertEqual(post.content.map(\.type), [9, 20, 2, 10])
+    XCTAssertEqual(post.content[1].width, 80)
+    XCTAssertEqual(post.content[3].url?.query, "voice_md5=voice-id&play_from=pb_voice_play")
+  }
+  @MainActor func testLegacyFormSignatureVector() {
+    XCTAssertEqual(TiebaTransport.sign(["b": "two", "a": "x y", "sign": "ignored"]), "1D9722E384CAA1E7693DB1062F7ADFEA")
+    XCTAssertEqual(Array(DeviceCipher.rc442(Data("Plaintext".utf8), key: Data("Key".utf8))), [0x91, 0xd9, 0x3c, 0xc2, 0xf3, 0x6a, 0x85, 0x20, 0xf9])
+  }
   func testLegacyFIFOAndAccountNamespaces() throws {
     let defaults = UserDefaults(suiteName: "TiebaCoreTests.\(UUID())")!
     var library = try LocalLibrary.load(account: "123", defaults: defaults)

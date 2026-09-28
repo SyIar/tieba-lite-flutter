@@ -1,17 +1,26 @@
 import SwiftUI
 
 enum Route: Hashable {
-  case forum(String), thread(String, String, Int, Bool), user(String), search(String), collection(String), settings, accounts, topics, topic(String, String), info(String, String), drafts
+  case forum(String), thread(String, String, Int, Bool), user(String), search(String), collection(String), settings, accounts, topics, topic(String, String), info(String, String), drafts, inbox
   static func link(_ url: URL) -> Route? {
-    guard url.scheme == "tblite" || (url.scheme == "https" && ["tieba.baidu.com", "tiebac.baidu.com"].contains(url.host ?? "")) else { return nil }
+    guard url.user == nil, url.password == nil, url.scheme == "tblite" || (url.scheme == "https" && ["tieba.baidu.com", "tiebac.baidu.com"].contains(url.host ?? "")) else { return nil }
     let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
     func value(_ key: String) -> String { query.first { $0.name == key }?.value ?? "" }
     let parts = url.pathComponents.filter { $0 != "/" }
-    if url.scheme == "tblite", url.host == "user", !value("uid").isEmpty { return .user(value("uid")) }
+    func validID(_ id: String) -> Bool { id.range(of: "^[1-9][0-9]*$", options: .regularExpression) != nil }
+    if url.scheme == "tblite" {
+      switch url.host {
+      case "thread": guard parts.count == 1, validID(parts[0]) else { return nil }; return .thread(parts[0], value("pid"), max(1, Int(value("pn")) ?? 1), false)
+      case "forum": guard parts.count <= 1 else { return nil }; let name = parts.first ?? value("kw"); return name.isEmpty ? nil : .forum(name)
+      case "user": let id = parts.first ?? value("uid"); return parts.count <= 1 && validID(id) ? .user(id) : nil
+      case "notifications": return .inbox
+      default: return nil
+      }
+    }
     let id = parts.count > 1 && parts[0] == "p" ? parts[1] : value("tid")
-    if !id.isEmpty, id.allSatisfy(\.isNumber) { return .thread(id, value("pid"), max(1, Int(value("pn")) ?? 1), false) }
+    if validID(id), parts.count == 2 { return .thread(id, value("pid"), max(1, Int(value("pn")) ?? 1), false) }
     let name = value("kw").isEmpty ? value("fname") : value("kw")
-    if !name.isEmpty { return .forum(name) }
+    if !name.isEmpty, url.path == "/f" { return .forum(name) }
     return nil
   }
 }
@@ -56,7 +65,13 @@ struct AppRoot: View {
       }.ignoresSafeArea()
     }
     .alert(tr("operationFailed"), isPresented: Binding(get: { app.ready && app.error != nil }, set: { if !$0 { app.error = nil } })) { Button(tr("done")) { app.error = nil } } message: { Text(app.error ?? "") }
-    .sheet(item: Binding(get: { deepLink.map(RouteItem.init) }, set: { deepLink = $0?.route })) { item in NavigationStack { Destination(route: item.route).navigationDestination(for: Route.self) { Destination(route: $0) }.toolbar { ToolbarItem(placement: .cancellationAction) { Button(tr("close")) { deepLink = nil } } } }
+    .sheet(item: Binding(get: { deepLink.map(RouteItem.init) }, set: { deepLink = $0?.route })) { item in
+      NavigationStack {
+        Destination(route: item.route)
+          .navigationDestination(for: Route.self) { Destination(route: $0) }
+          .toolbar { ToolbarItem(placement: .cancellationAction) { Button(tr("close")) { deepLink = nil } } }
+      }
+    }
     .onOpenURL { url in if let target = Route.link(url) { deepLink = target } else { app.error = tr("invalidLink") } }
   }
   private func navigation<Content: View>(@ViewBuilder content: () -> Content) -> some View { NavigationStack { content().navigationDestination(for: Route.self) { Destination(route: $0) } } }
@@ -78,6 +93,7 @@ struct Destination: View {
     case .topic(let id, let name): TopicView(id: id, name: name)
     case .info(let id, let name): ForumInfoView(id: id, name: name)
     case .drafts: DraftsView()
+    case .inbox: InboxView()
     }
   }
 }

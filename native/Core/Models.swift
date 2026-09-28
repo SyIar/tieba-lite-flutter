@@ -64,7 +64,7 @@ struct UserProfile: Identifiable {
   }
   var level: Int { integer(raw["level_id"] ?? raw["level"]) }
   var intro: String { first(raw, ["intro", "display_intro"]) }
-  var following: Bool { boolean(raw["has_concerned"] ?? raw["is_friend"] ?? raw["isFollowing"]) }
+  var following: Bool { boolean(raw["has_concerned"]) || boolean(raw["is_friend"]) || boolean(raw["isFollowing"]) }
   var followers: Int { integer(raw["fans_num"] ?? raw["followerCount"]) }
   var follows: Int { integer(raw["concern_num"] ?? raw["followingCount"]) }
   var posts: Int { integer(raw["post_num"] ?? raw["threadCount"]) }
@@ -82,7 +82,7 @@ struct Forum: Identifiable {
   }
   var threads: Int { integer(raw["thread_num"] ?? raw["thread_count"] ?? raw["post_num"] ?? raw["threadCount"]) }
   var level: Int { integer(raw["user_level"] ?? raw["level_id"] ?? raw["level"]) }
-  var following: Bool { boolean(raw["is_like"] ?? raw["has_concerned"] ?? raw["isFollowing"]) }
+  var following: Bool { boolean(raw["is_like"]) || boolean(raw["has_concerned"]) || boolean(raw["isFollowing"]) }
   var signed: Bool {
     get { boolean(raw["isSigned"] ?? raw["is_sign_in"] ?? object(object(raw["sign_in_info"])["user_info"])["is_sign_in"]) }
     set { raw["isSigned"] = newValue }

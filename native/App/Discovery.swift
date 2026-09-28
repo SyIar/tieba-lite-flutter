@@ -8,19 +8,30 @@ struct ExploreView: View {
   @State private var loading = false
   @State private var error: String?
   @State private var request = UUID()
+  @State private var hotCode = "all"
+  @State private var hotTabs: [JSON] = []
   var body: some View {
     List {
       Section { Picker(tr("explore"), selection: $kind) { Text(tr("recommended")).tag("recommended"); Text(tr("concern")).tag("concern"); Text(tr("hot")).tag("hot") }.pickerStyle(.segmented) }
-      if kind == "hot" { NavigationLink(tr("hotTopics"), value: Route.topics) }
+      if kind == "hot" {
+        NavigationLink(tr("hotTopics"), value: Route.topics)
+        if !hotTabs.isEmpty { Picker(tr("filter"), selection: $hotCode) { ForEach(Array(hotTabs.enumerated()), id: \.offset) { _, row in Text(first(row, ["tab_title", "tab_name"])).tag(string(row["tab_code"])) } } }
+      }
       Section { ForEach(result.items) { ThreadCard(thread: $0) }; LoadState(loading: loading, error: error, empty: result.items.isEmpty) { request = UUID() } }
     }.navigationTitle(tr("explore"))
       .toolbar { ToolbarItem(placement: .topBarTrailing) { NavigationLink(value: Route.search("")) { Image(systemName: "magnifyingglass") } }; Pagination(page: page, more: result.hasMore, loading: loading, previous: { page -= 1; request = UUID() }, refresh: { request = UUID() }, next: { page += 1; request = UUID() }) }
       .onChange(of: kind) { _, _ in page = 1; result = PageResult(); request = UUID() }
+      .onChange(of: hotCode) { _, _ in page = 1; request = UUID() }
       .task(id: request) { await load() }.refreshable { page = 1; await load() }
   }
   private func load() async {
     loading = true; error = nil; defer { loading = false }
-    do { let data = try await app.api.feed(kind, page: page); if !Task.isCancelled { result = data } } catch { if !Task.isCancelled { self.error = error.localizedDescription } }
+    do {
+      if kind == "hot" {
+        let data = try await app.api.hotOverview(code: hotCode)
+        if !Task.isCancelled { hotTabs = records(data["hot_thread_tab_info"]); result = PageResult(items: records(data["thread_info"]).filter { integer($0["is_ad"]) == 0 && $0["advertisement"] == nil }.map { ThreadSummary($0) }) }
+      } else { let data = try await app.api.feed(kind, page: page); if !Task.isCancelled { result = data } }
+    } catch { if !Task.isCancelled { self.error = error.localizedDescription } }
   }
 }
 
@@ -100,7 +111,7 @@ struct InboxView: View {
             VStack(alignment: .leading, spacing: 7) {
               Text(first(item, ["title", "thread_title"])).font(.subheadline.weight(.semibold)).lineLimit(2)
               Text(first(item, ["content", "reply_content", "abstract"])).font(.subheadline).lineLimit(4)
-              Text(first(item, ["user_name", "name_show", "replyer_name"])).font(.caption).foregroundStyle(.secondary)
+              Text(UserProfile(raw: object(item["replyer"] ?? item["user"])).name).font(.caption).foregroundStyle(.secondary)
             }
           }
         }
@@ -125,7 +136,7 @@ struct TopicsView: View {
   var body: some View {
     List {
       ForEach(Array(topics.enumerated()), id: \.offset) { index, row in
-        let name = first(row, ["topic_name", "name", "topic_desc"])
+        let name = first(row, ["topic_name", "title", "name", "topic_desc"])
         NavigationLink(value: Route.topic(first(row, ["topic_id", "id"]), name)) { HStack { Text(String(index + 1)).font(.headline).foregroundStyle(.tint).frame(width: 28); VStack(alignment: .leading, spacing: 4) { Text(name); Text(first(row, ["abstract", "discuss_num", "hot_value"])).font(.caption).foregroundStyle(.secondary) } } }
       }
       LoadState(loading: loading, error: error, empty: topics.isEmpty) { request = UUID() }

@@ -56,6 +56,7 @@ struct RemotePicture: View {
   let url: URL
   let thumbnail: URL?
   var preview = false
+  var open: (() -> Void)? = nil
   @EnvironmentObject private var settings: Preferences
   @Environment(\.colorScheme) private var scheme
   @ObservedObject private var cache = PictureCache.shared
@@ -70,7 +71,7 @@ struct RemotePicture: View {
     Group {
       if let image {
         Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: preview ? 120 : 460)
-          .opacity(scheme == .dark && settings.flag("imageDarkenWhenNightMode") ? 0.8 : 1).onTapGesture { if !preview { showing = true } }
+          .opacity(scheme == .dark && settings.flag("imageDarkenWhenNightMode") ? 0.8 : 1).onTapGesture { if let open { open() } else if !preview { showing = true } }
       } else {
         ZStack {
           Color(uiColor: .tertiarySystemFill)
@@ -87,6 +88,7 @@ struct RemotePicture: View {
 
 struct ImageGallery: View {
   let urls: [URL]
+  var initialIndex = 0
   @Environment(\.dismiss) private var dismiss
   @State private var selection = 0
   @State private var images: [URL: UIImage] = [:]
@@ -113,7 +115,7 @@ struct ImageGallery: View {
             }
           }
         }
-    }.preferredColorScheme(.dark).alert(tr("saveImage"), isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button(tr("done")) {} } message: { Text(error ?? "") }
+    }.preferredColorScheme(.dark).onAppear { selection = initialIndex }.alert(tr("saveImage"), isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button(tr("done")) {} } message: { Text(error ?? "") }
   }
   private func save(_ url: URL) async {
     let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
@@ -179,7 +181,7 @@ struct RichContent: View {
   let parts: [ContentPart]
   @EnvironmentObject private var settings: Preferences
   @State private var playback: URL?
-  @State private var gallery: [URL] = []
+  @State private var gallery: URL?
   private var groups: [[ContentPart]] {
     var output: [[ContentPart]] = []
     for part in parts {
@@ -194,7 +196,7 @@ struct RichContent: View {
       ForEach(Array(groups.enumerated()), id: \.offset) { _, group in
         if let part = group.first {
           if [0, 1, 2, 4, 9, 27].contains(part.type) { inline(group).textSelection(.enabled).lineSpacing(2).fixedSize(horizontal: false, vertical: true) }
-          else if [3, 20].contains(part.type), !settings.flag("hideMedia"), let url = part.url { RemotePicture(url: url, thumbnail: part.thumbnail) }
+          else if [3, 20].contains(part.type), !settings.flag("hideMedia"), let url = part.url { RemotePicture(url: url, thumbnail: part.thumbnail, open: { gallery = url }) }
           else if [5, 10].contains(part.type), !settings.flag("hideMedia"), let url = part.url {
             Button { playback = url } label: { Label(tr(part.type == 10 ? "audio" : "video"), systemImage: "play.circle.fill").frame(maxWidth: .infinity, alignment: .leading).padding(12) }.buttonStyle(.glass)
           } else if !part.text.isEmpty { Text(part.text).foregroundStyle(.secondary) }
@@ -202,6 +204,10 @@ struct RichContent: View {
       }
     }.onAppear { Emoticons.learn(parts) }
       .fullScreenCover(item: Binding(get: { playback.map(URLItem.init) }, set: { playback = $0?.url })) { NativePlayer(url: $0.url) }
+      .fullScreenCover(item: Binding(get: { gallery.map(URLItem.init) }, set: { gallery = $0?.url })) { item in
+        let urls = parts.filter { [3, 20].contains($0.type) }.compactMap(\.url)
+        ImageGallery(urls: urls, initialIndex: urls.firstIndex(of: item.url) ?? 0)
+      }
   }
   private func inline(_ parts: [ContentPart]) -> Text {
     parts.reduce(Text("")) { accumulated, part in

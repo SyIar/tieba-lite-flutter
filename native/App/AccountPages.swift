@@ -63,7 +63,12 @@ struct CollectionView: View {
         if historyTab == "threads" {
           ForEach(Array(app.library.rows("history").enumerated()), id: \.offset) { _, row in
             NavigationLink(value: Route.thread(string(row["threadId"]), string(row["lastPostId"]), max(1, integer(row["page"])), boolean(row["onlyAuthor"]))) { VStack(alignment: .leading, spacing: 6) { Text(string(row["title"])).lineLimit(2); Text(string(row["forumName"])).font(.caption).foregroundStyle(.secondary) } }
-              .swipeActions { Button(tr("clear"), role: .destructive) { app.updateLibrary { $0.document["history"] = $0.rows("history").filter { string($0["threadId"]) != string(row["threadId"]) } } } }
+              .swipeActions {
+                Button(tr("clear"), role: .destructive) {
+                  app.updateLibrary { $0.document["history"] = $0.rows("history").filter { string($0["threadId"]) != string(row["threadId"]) } }
+                }
+              }
+          }
         } else {
           ForEach(Array(app.library.rows("forumHistory").enumerated()), id: \.offset) { _, row in
             let forum = Forum(raw: object(row["forum"]))
@@ -153,7 +158,7 @@ struct ProfileEditor: View {
     var committed = false
     do {
       var fields: JSON = [:]
-      if name != profile.name { fields["nickname"] = name }
+      if name != profile.name { fields["nick_name"] = name.trimmingCharacters(in: .whitespacesAndNewlines) }
       if intro != profile.intro { fields["intro"] = intro }
       if sex != integer(profile.raw["sex"]) && sex > 0 { fields["sex"] = sex }
       if !fields.isEmpty { try await app.api.updateProfile(fields); committed = true }
