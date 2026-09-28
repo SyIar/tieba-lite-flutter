@@ -33,9 +33,9 @@
 
 ## 验证与预览
 
-- 本地 Dart analyze、全部 72 项 Flutter tests 通过；新增 6 项覆盖迁移只执行一次、字体切换与持久化、系统外观实时变化、不透明回退、iOS 辅助功能通知及 320 宽／2 倍字号的楼层操作。
+- 本地 Dart analyze 与外观／启动相关 8 项测试通过，云端全部 72 项 Flutter tests 通过；新增 6 项覆盖迁移只执行一次、字体切换与持久化、系统外观实时变化、不透明回退、iOS 辅助功能通知及 320 宽／2 倍字号的楼层操作。
 - 下图来自真实 Flutter widgets 的离线 fixture，尺寸 402 × 874 logical pixels，Windows 无法渲染 Apple 系统字体，预览仅使用已有 Noto Sans 近似展示字形并载入正式图标；不是 iPhone 截屏，不包含系统状态栏，也不代表已验证真实账号接口。
-- iOS 云构建与安装包信息单独记录在 [VALIDATION.md](VALIDATION.md)。
+- iOS `0.1.0 (9)` 云构建、下载与制品校验通过，未安装到手机；安装包信息记录在 [VALIDATION.md](VALIDATION.md)。
 
 | 浅色 | 深色 |
 | --- | --- |

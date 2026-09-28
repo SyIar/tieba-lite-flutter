@@ -1,13 +1,13 @@
 # 验证记录
 
-日期：2026-09-24。上游基线见 `FEATURE_MATRIX.md`，工具链固定为 Flutter 3.47.5 / Dart 3.13.4。
+更新日期：2026-09-28。上游基线见 `FEATURE_MATRIX.md`，工具链固定为 Flutter 3.47.5 / Dart 3.13.4。
 
 ## 已完成
 
 - `flutter analyze --no-pub`：No issues found。
-- `flutter test --no-pub`：最新 CI 的 66 tests 全部通过，包含 protocol fixtures、账号存储与 WebView session 隔离、iOS 插件初始化回归、启动恢复、登录异常后的导航清理、关注人数缺失与签到状态、置顶帖分组和分页去重、分页和楼层定位、历史迁移、最近访问 FIFO、缓存与草稿隔离、图标 channel、avatar crop、emoticons 和 deep link。
+- `flutter test --no-pub`：最新 CI 的 72 tests 全部通过，包含系统字体切换与持久化、跟随系统外观、玻璃辅助功能回退、紧凑楼层大字号布局、protocol fixtures、账号存储与 WebView session 隔离、iOS 插件初始化回归、启动恢复、登录异常后的导航清理、关注人数缺失与签到状态、置顶帖分组和分页去重、分页和楼层定位、历史迁移、最近访问 FIFO、缓存与草稿隔离、图标 channel、avatar crop、emoticons 和 deep link。
 - `flutter build web --release --no-pub`：成功；在 402 × 874 预览中确认中文字体、首页、个人页、设置和浅色 / 深色切换，检查时没有前端 error log。
-- `scripts/check_repository.py`：源码语言与本地化 key 检查通过；306 对 EN/ZH ARB keys 对齐。
+- `scripts/check_repository.py`：源码语言与本地化 key 检查通过；310 对 EN/ZH ARB keys 对齐。
 - 原生配置静态验证：5 个 plist / entitlements 可解析；57 个 icon catalog 引用尺寸正确且不透明。
 - Python 打包校验脚本语法与 Mach-O 架构识别检查通过；两个 CI shell scripts 的 Bash 语法检查通过。
 - Guest 只读接口探测记录在 `API_MIGRATION.md`。定位楼层的真实请求已确认应使用 `pn=0` / `pid`，并读取服务端实际页码。
@@ -29,7 +29,7 @@
 
 - [运行 35998406483](https://github.com/SyIar/tieba-lite-flutter/actions/runs/35998406483) 成功，source `4c92398a9963306c9e00f76145c5cd375d09a70b`，包含 iOS 登录初始化修复与新的默认蓝底白色圆润“贴”字图标。
 - 58 tests、Dart analyze、Web release、Xcode 26.3 编译、IPA 打包及云端结构校验全部通过。
-- build `4` 安装文件归档：`artifacts/run-35998406483/TiebaLite-unsigned.ipa`，`25,712,323` bytes；固定安装路径现已更新为下述 build `8`。
+- build `4` 安装文件归档：`artifacts/run-35998406483/TiebaLite-unsigned.ipa`，`25,712,323` bytes；固定安装路径现已更新为下述 build `9`。
 - IPA SHA-256：`a1af01aad4f12ee267f62cb8d405cc69f2df8047c55b89f09f532ae4ec1920a5`；本机重复校验 ZIP、device arm64、source commit、build number 和文件复制校验值均通过。
 - 从 IPA 提取主图标并对 Xcode 的 CgBI PNG 做无损解码，120 × 120 RGB 像素与新源图对应尺寸完全一致。图标源图与提示词见 `APP_ICON.md`。
 
@@ -49,13 +49,22 @@
 - 下载后在 Windows 复核 ZIP、device arm64、bundle identifier、source commit、Flutter revision、版本 `0.1.0 (7)` 和复制前后 SHA-256，全部通过。没有操作 Sideloadly、执行真实签到或安装手机，真机回归待完成。
 - [运行 36002485999](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36002485999)，build `6`：为纳入“仅实时关注列表显示签到状态”的最终调整主动取消，没有交付 IPA；不记为编译失败。
 
-### 最新安装包：0.1.0 (8)，仅打包未安装
+### 置顶帖紧凑展示包：0.1.0 (8)，仅打包未安装
 
 - [运行 36005115695](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36005115695) 成功，source `0c355f5b8cb20d6f5161907bf9f485a3f8695a04`。新增吧内置顶帖单行标题列表，保留前述关注/签到、FIFO、登录修复和新图标。
 - 云端 66 tests、Dart analyze、Web release、Xcode `26.3 / 17C529` 编译、IPA 打包与结构校验全部通过。
-- 最新 unsigned IPA：`D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`，`25,715,557` bytes。归档：`artifacts/run-36005115695/`，同目录保存 `SHA256SUMS` 和 `build-info.json`。
+- build `8` unsigned IPA：`25,715,557` bytes。归档：`artifacts/run-36005115695/`，同目录保存 `SHA256SUMS` 和 `build-info.json`。
 - SHA-256：`e0f3e56a55fe1eb0b3e58126f3f12635ee18a67332a0763c7036d491cddd6850`。Windows 下载后复核 ZIP、device arm64、bundle identifier、source commit、Flutter revision、版本 `0.1.0 (8)` 与复制前后 SHA-256，全部通过。
 - 本次仅更新安装包，没有操作 Sideloadly、手机安装或自动续签缓存；iPhone 上的最终显示与点击验收待完成。
+
+### 最新安装包：0.1.0 (9)，仅打包未安装
+
+- [运行 36372462916](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36372462916) 成功，source `35357bcebd47a9c9883cd978eb5749e8dff37f65`。默认使用 iOS 系统字体，新增黑白灰／蓝色主题、跟随系统外观、紧凑楼层排版和 Flutter 玻璃风格控件；保留此前全部迭代。详情与离线预览见 [APPEARANCE.md](APPEARANCE.md)。
+- 云端 72 tests、Dart analyze、Web release、Xcode `26.3 / 17C529` 编译、IPA 打包与结构校验全部通过。本地最终字体调整后再次通过 Dart analyze、外观与启动相关测试及仓库语言检查。
+- 最新 unsigned IPA：`D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`，`25,730,679` bytes。原包、`SHA256SUMS` 与 `build-info.json` 归档于 `artifacts/run-36372462916/`。
+- SHA-256：`1c4947efdb8c205eea595a816b434a6603ecc601a903ef0b450d492e43f12142`。Windows 下载后验证 ZIP 完整性、device arm64、bundle identifier、source commit、Flutter revision、版本 `0.1.0 (9)`、复制前后哈希一致；包内与 FontManifest 均不含 Source Han 字体。
+- 包体相比 build `8` 增加 `15,122` bytes，没有加入思源宋体资源。已有 Noto Sans 保留为可选字体；默认字体交给 iOS 选择，不需要在线下载。
+- 仅更新固定安装包和文档；没有操作 Sideloadly、手机安装或自动续签缓存。build `8` 原包保留，最近一次确认的真机安装仍为 build `4`。玻璃效果与滚动流畅度、系统外观切换的真机验收待安装后完成。
 
 ## Wi-Fi 安装记录
 
