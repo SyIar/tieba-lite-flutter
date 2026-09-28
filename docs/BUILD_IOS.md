@@ -2,7 +2,7 @@
 
 ## 当前边界
 
-`.github/workflows/ios-unsigned.yml` 已在 [run 36372462916](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36372462916) 成功执行。最新安装包 `0.1.0 (9)` 默认使用 iOS 系统字体，提供中性黑白／蓝色配色、跟随系统深浅色、紧凑楼层和 Flutter 玻璃风格控件；保留此前 FIFO、关注／签到、置顶帖、登录与图标改动。没有加入思源宋体。unsigned IPA 已下载并验证到 `D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`。沿用用户只打包的要求，未安装到手机；最近一次已确认安装为 `0.1.0 (4)`。版本来源、校验值和 iPhone 验收见 [VALIDATION.md](VALIDATION.md)，外观说明见 [APPEARANCE.md](APPEARANCE.md)。
+`.github/workflows/ios-unsigned.yml` 已在 [run 36372462916](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36372462916) 成功执行。最新安装包 `0.1.0 (9)` 默认使用 iOS 系统字体，提供中性黑白／蓝色配色、跟随系统深浅色、紧凑楼层和 Flutter 玻璃风格控件；保留此前 FIFO、关注／签到、置顶帖、登录与图标改动。没有加入思源宋体。unsigned IPA 已下载并验证到 `D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`。用户随后授权安装，2026-09-28 已通过 Sideloadly Wi-Fi 覆盖安装 `0.1.0 (9)` 并更新自动刷新登记；用户确认能正常打开，新界面显示正常。版本来源、校验值和 iPhone 验收见 [VALIDATION.md](VALIDATION.md)，外观说明见 [APPEARANCE.md](APPEARANCE.md)。
 
 该工作流只通过 Actions 页面手动触发，普通 push 不会触发构建。用户已于 2026-09-24 确认使用公开仓库 [SyIar/tieba-lite-flutter](https://github.com/SyIar/tieba-lite-flutter) 和标准 GitHub-hosted runner；未启用付费 runner 或修改账单设置。
 

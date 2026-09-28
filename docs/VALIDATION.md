@@ -57,14 +57,16 @@
 - SHA-256：`e0f3e56a55fe1eb0b3e58126f3f12635ee18a67332a0763c7036d491cddd6850`。Windows 下载后复核 ZIP、device arm64、bundle identifier、source commit、Flutter revision、版本 `0.1.0 (8)` 与复制前后 SHA-256，全部通过。
 - 本次仅更新安装包，没有操作 Sideloadly、手机安装或自动续签缓存；iPhone 上的最终显示与点击验收待完成。
 
-### 最新安装包：0.1.0 (9)，仅打包未安装
+### 最新安装包：0.1.0 (9)，已通过 Wi-Fi 安装
 
 - [运行 36372462916](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36372462916) 成功，source `35357bcebd47a9c9883cd978eb5749e8dff37f65`。默认使用 iOS 系统字体，新增黑白灰／蓝色主题、跟随系统外观、紧凑楼层排版和 Flutter 玻璃风格控件；保留此前全部迭代。详情与离线预览见 [APPEARANCE.md](APPEARANCE.md)。
 - 云端 72 tests、Dart analyze、Web release、Xcode `26.3 / 17C529` 编译、IPA 打包与结构校验全部通过。本地最终字体调整后再次通过 Dart analyze、外观与启动相关测试及仓库语言检查。
 - 最新 unsigned IPA：`D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`，`25,730,679` bytes。原包、`SHA256SUMS` 与 `build-info.json` 归档于 `artifacts/run-36372462916/`。
 - SHA-256：`1c4947efdb8c205eea595a816b434a6603ecc601a903ef0b450d492e43f12142`。Windows 下载后验证 ZIP 完整性、device arm64、bundle identifier、source commit、Flutter revision、版本 `0.1.0 (9)`、复制前后哈希一致；包内与 FontManifest 均不含 Source Han 字体。
 - 包体相比 build `8` 增加 `15,122` bytes，没有加入思源宋体资源。已有 Noto Sans 保留为可选字体；默认字体交给 iOS 选择，不需要在线下载。
-- 仅更新固定安装包和文档；没有操作 Sideloadly、手机安装或自动续签缓存。build `8` 原包保留，最近一次确认的真机安装仍为 build `4`。玻璃效果与滚动流畅度、系统外观切换的真机验收待安装后完成。
+- 首次交付只打包。用户随后授权安装，2026-09-28 已通过 Sideloadly `@Wi-Fi` 覆盖安装，显示 `Done. / 100%`。daemon 安装记录时间为 `12:11:49`，后续设备扫描确认 `0.1.0 (9)`；用户确认能正常打开，帖子新界面显示正常。build `8` 原包保留。
+- 自动刷新登记已指向新版 IPA：缓存标识与原包 MD5 `2a39df1c69326365a50ed4d812d5963e` 一致，size `25,730,679`；daemon 记录 `one_off=false`、`known_ttl=7`、`refresh_at_hours=96`、`failures_count=0`。
+- 本次真机反馈限于启动与新界面显示；系统外观实时切换、辅助功能与长列表持续滚动未逐项验收。此次手动安装也不代表已重新验证到期前后台刷新或电脑开机自启动。
 
 ## Wi-Fi 安装记录
 
@@ -72,6 +74,8 @@
 - 本地安装记录确认 `Tieba Lite` 已登记自动刷新，`one_off=0`、`known_ttl=7`、`refresh_at_hours=96`、`failures_count=0`；daemon 后续检查已识别该 App。
 - 用户随后确认可以正常进入首页，首次真机安装、启动与首页显示通过；真实百度登录及其他业务功能仍须分别确认。账号、设备标识、证书和原始日志未提交到仓库。
 - 20:29:15，`0.1.0 (4)` 在同一 `@Wi-Fi` 连接下覆盖安装完成，Sideloadly 显示 `Done. / 100%`。本地仅有一条有效的 Tieba Lite 自动刷新记录，`one_off=0`、`failures_count=0`，缓存文件标识与新的 IPA 内容匹配。用户在登录页和桌面图标复验请求后回复“ok了”，确认本次问题解决；未将此反馈扩大为所有已登录业务的逐项验收。
+
+- 2026-09-28，用户授权新版安装。Sideloadly 已通过 `@Wi-Fi` 完成 `0.1.0 (9)` 覆盖安装并显示 `Done. / 100%`，自动刷新登记关联新版缓存；用户确认能正常打开，帖子新配色和紧凑楼层显示正常。
 
 ## iOS 登录初始化修复
 
