@@ -41,15 +41,3 @@ jobs:
           path: artifacts/native/
           if-no-files-found: error
           retention-days: 14
-      - name: Verify native launch and settings navigation
-        if: ${{ !inputs.core_only }}
-        run: python3 scripts/smoke_native.py
-      - if: ${{ always() && !inputs.core_only }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
-        with:
-          name: TiebaLite-native-ui-${{ github.run_number }}
-          path: |
-            artifacts/native-ui/screenshots/
-            artifacts/native-ui/summary.json
-          if-no-files-found: ignore
-          retention-days: 14

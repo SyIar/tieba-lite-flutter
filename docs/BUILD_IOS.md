@@ -1,6 +1,20 @@
 # iOS 云构建和安装
 
-## 当前边界
+## 当前原生 Swift 构建
+
+当前发布 target 为 `native/project.yml` 定义的 `TiebaLite`。在 GitHub Actions 选择 **Build native Swift iOS app**（`ios-native.yml`），`core_only=false`，运行完整构建。
+
+- macOS 15 / Xcode 26.3；SwiftProtobuf 固定 1.38.1；XcodeGen 生成工程。
+- Swift core 测试比较旧 Dart 二进制协议和持久化格式。
+- iPhone arm64 Release 构建后检查显示名称、bundle identifier、资源和无 Flutter runtime。
+- 按用户 2026-09-28 的要求，工作流不再执行模拟器校验，由用户安装到 iPhone 后测试。
+- unsigned IPA 在 `TiebaLite-native-unsigned-<run_number>` artifact；下载后使用本人 Sideloadly 账号重签。
+- 保留 `org.tblite.flutter.tiebaLite` 作为更新标识，名称中的 `flutter` 不代表新包仍运行 Flutter。
+- 原生最低版本为 iOS 26。安装及数据迁移仍需真机验证；不要先卸载旧版。
+
+最新验证状态见 [SWIFT_MIGRATION.md](SWIFT_MIGRATION.md)。以下保留旧 Flutter 流程作为历史说明，不是当前原生构建命令。
+
+## 旧 Flutter 构建记录
 
 `.github/workflows/ios-unsigned.yml` 已在 [run 36372462916](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36372462916) 成功执行。最新安装包 `0.1.0 (9)` 默认使用 iOS 系统字体，提供中性黑白／蓝色配色、跟随系统深浅色、紧凑楼层和 Flutter 玻璃风格控件；保留此前 FIFO、关注／签到、置顶帖、登录与图标改动。没有加入思源宋体。unsigned IPA 已下载并验证到 `D:\workspace\sideloadly-setup\TiebaLite-unsigned.ipa`。用户随后授权安装，2026-09-28 已通过 Sideloadly Wi-Fi 覆盖安装 `0.1.0 (9)` 并更新自动刷新登记；用户确认能正常打开，新界面显示正常。版本来源、校验值和 iPhone 验收见 [VALIDATION.md](VALIDATION.md)，外观说明见 [APPEARANCE.md](APPEARANCE.md)。
 

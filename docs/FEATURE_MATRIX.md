@@ -1,5 +1,7 @@
 # Tieba Lite Flutter feature matrix
 
+> This is the legacy Flutter baseline. The active native Swift implementation and its verification boundaries are documented in [SWIFT_MIGRATION.md](SWIFT_MIGRATION.md). Prior Flutter acceptance does not establish native Swift acceptance.
+
 Reference: [HuanCheng65/TiebaLite, 4.0-dev](https://github.com/HuanCheng65/TiebaLite/tree/4.0-dev), commit `2885b2aabbbf47aba7bf12b1cd7cbc03b1f5ec15`.
 
 This document distinguishes implemented Flutter code from verified behavior. A screen, a successful guest API request, a signed IPA build, and an authenticated iPhone acceptance test are separate milestones. No production account writes were executed during development.
