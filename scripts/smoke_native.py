@@ -15,9 +15,12 @@ device = devices[0]["udid"]
 output = Path("artifacts/native-ui")
 output.mkdir(parents=True, exist_ok=True)
 result = output / "Launch.xcresult"
-subprocess.run(["xcodebuild", "test", "-project", "native/TiebaLite.xcodeproj", "-scheme", "TiebaLite",
+test = subprocess.run(["xcodebuild", "test", "-project", "native/TiebaLite.xcodeproj", "-scheme", "TiebaLite",
                 "-configuration", "Debug", "-destination", f"platform=iOS Simulator,id={device}",
                 "-derivedDataPath", "native/simulator-build", "-resultBundlePath", str(result),
-                "-parallel-testing-enabled", "NO", "CODE_SIGNING_ALLOWED=NO"], check=True)
+                "-parallel-testing-enabled", "NO", "CODE_SIGNING_ALLOWED=YES", "CODE_SIGN_IDENTITY=-"])
 subprocess.run(["xcrun", "xcresulttool", "export", "attachments", "--path", str(result),
-                "--output-path", str(output / "screenshots")], check=True)
+                "--output-path", str(output / "screenshots")], check=False)
+summary = subprocess.run(["xcrun", "xcresulttool", "get", "test-results", "summary", "--path", str(result)], capture_output=True, text=True)
+(output / "summary.json").write_text(summary.stdout or summary.stderr)
+raise SystemExit(test.returncode)

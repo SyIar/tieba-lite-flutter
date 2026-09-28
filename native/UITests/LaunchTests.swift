@@ -5,7 +5,10 @@ final class LaunchTests: XCTestCase {
     continueAfterFailure = false
     let app = XCUIApplication()
     app.launch()
-    XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 20))
+    let ready = app.tabBars.firstMatch.waitForExistence(timeout: 20)
+    capture("Launch state")
+    if !ready { let hierarchy = XCTAttachment(string: app.debugDescription); hierarchy.lifetime = .keepAlways; add(hierarchy) }
+    XCTAssertTrue(ready)
     XCTAssertEqual(app.tabBars.buttons.count, 4)
     capture("Native home")
     app.tabBars.buttons.element(boundBy: 3).tap()
