@@ -11,6 +11,9 @@ import 'features/main_shell.dart';
 import 'l10n/app_localizations.dart';
 import 'platform/deep_links.dart';
 import 'platform/theme_backdrop.dart';
+import 'platform/glass_accessibility.dart';
+import 'theme/app_theme.dart';
+import 'widgets/glass.dart';
 
 class TiebaLiteApp extends StatefulWidget {
   const TiebaLiteApp({super.key});
@@ -86,7 +89,7 @@ class _TiebaLiteAppState extends State<TiebaLiteApp> {
           final navigatorContext = _navigatorKey.currentContext;
           if (navigatorContext != null) {
             final labels = AppLocalizations.of(navigatorContext);
-            await showDialog<void>(
+            await showGlassDialog<void>(
               context: navigatorContext,
               builder: (context) => AlertDialog(
                 content: Text(labels.localDataRecoveryNotice),
@@ -143,101 +146,6 @@ class _TiebaLiteAppState extends State<TiebaLiteApp> {
     WidgetsBinding.instance.ensureVisualUpdate();
   }
 
-  ThemeData _theme(Brightness brightness) {
-    final preferences = _controller?.settings;
-    final seed = Color(
-      preferences?.getInt('customPrimaryColor', fallback: 0xFF167D8D) ??
-          0xFF167D8D,
-    );
-    final radius = (preferences?.getDouble('radius', fallback: 20) ?? 20).clamp(
-      0.0,
-      32.0,
-    );
-    var colors = ColorScheme.fromSeed(seedColor: seed, brightness: brightness);
-    var canvas = const Color(0xFFF7F9FA);
-    if (brightness == Brightness.dark) {
-      final (base, card) = switch (preferences?.getString(
-        'darkPalette',
-        fallback: 'grey_dark',
-      )) {
-        'blue_dark' => (const Color(0xFF17212B), const Color(0xFF202B37)),
-        'amoled_dark' => (const Color(0xFF000000), const Color(0xFF101010)),
-        _ => (const Color(0xFF202020), const Color(0xFF2A2A2A)),
-      };
-      canvas = base;
-      colors = colors.copyWith(
-        surface: base,
-        surfaceContainerLowest: base,
-        surfaceContainerLow: card,
-        surfaceContainer: Color.alphaBlend(
-          Colors.white.withValues(alpha: .03),
-          card,
-        ),
-        surfaceContainerHigh: Color.alphaBlend(
-          Colors.white.withValues(alpha: .06),
-          card,
-        ),
-        surfaceContainerHighest: Color.alphaBlend(
-          Colors.white.withValues(alpha: .09),
-          card,
-        ),
-      );
-    }
-    final background =
-        preferences?.getString('themeBackground').isNotEmpty == true;
-    if (background) {
-      final opacity =
-          preferences
-              ?.getDouble('themeSurfaceOpacity', fallback: .85)
-              .clamp(.2, 1.0) ??
-          .85;
-      colors = colors.copyWith(
-        surfaceContainer: colors.surfaceContainer.withValues(alpha: opacity),
-        surfaceContainerLow: colors.surfaceContainerLow.withValues(
-          alpha: opacity,
-        ),
-      );
-    }
-    return ThemeData(
-      useMaterial3: true,
-      fontFamily: 'NotoSansCJKsc',
-      brightness: brightness,
-      colorScheme: colors,
-      canvasColor: canvas,
-      scaffoldBackgroundColor: background ? Colors.transparent : canvas,
-      appBarTheme: AppBarTheme(
-        centerTitle: false,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        backgroundColor: preferences?.getBool('toolbarPrimaryColor') == true
-            ? colors.primaryContainer
-            : null,
-        foregroundColor: preferences?.getBool('toolbarPrimaryColor') == true
-            ? colors.onPrimaryContainer
-            : null,
-      ),
-      cardTheme: CardThemeData(
-        elevation: 0,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radius),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      navigationBarTheme: const NavigationBarThemeData(
-        height: 72,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      ),
-      dividerTheme: const DividerThemeData(space: 1, thickness: 0.5),
-    );
-  }
-
   Widget _materialApp(BuildContext context, AppController? app) => MaterialApp(
     navigatorKey: _navigatorKey,
     debugShowCheckedModeBanner: false,
@@ -245,8 +153,8 @@ class _TiebaLiteAppState extends State<TiebaLiteApp> {
     locale: const Locale('zh'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
-    theme: _theme(Brightness.light),
-    darkTheme: _theme(Brightness.dark),
+    theme: buildAppTheme(Brightness.light, app?.settings),
+    darkTheme: buildAppTheme(Brightness.dark, app?.settings),
     themeMode: switch (app?.settings.themeMode) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
@@ -254,28 +162,30 @@ class _TiebaLiteAppState extends State<TiebaLiteApp> {
     },
     builder: (context, child) {
       final media = MediaQuery.of(context);
-      return MediaQuery(
-        data: media.copyWith(
-          textScaler: TextScaler.linear(
-            media.textScaler.scale(1) * (app?.settings.fontScale ?? 1),
+      return GlassAccessibility(
+        child: MediaQuery(
+          data: media.copyWith(
+            textScaler: TextScaler.linear(
+              media.textScaler.scale(1) * (app?.settings.fontScale ?? 1),
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            if (app != null && child != null)
-              ThemeBackdrop(settings: app.settings, child: child)
-            else
-              ?child,
-            if (app?.changingAccount == true)
-              const Positioned.fill(
-                child: AbsorbPointer(
-                  child: ColoredBox(
-                    color: Color(0x55000000),
-                    child: Center(child: CircularProgressIndicator()),
+          child: Stack(
+            children: [
+              if (app != null && child != null)
+                ThemeBackdrop(settings: app.settings, child: child)
+              else
+                ?child,
+              if (app?.changingAccount == true)
+                const Positioned.fill(
+                  child: AbsorbPointer(
+                    child: ColoredBox(
+                      color: Color(0x55000000),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       );
     },

@@ -22,7 +22,7 @@ class MePage extends StatelessWidget {
     final app = AppScope.of(context);
     final user = app.profile;
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: Text(context.l10n.me),
         actions: [
           IconButton(
@@ -231,7 +231,7 @@ class AccountsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.accounts)),
+      appBar: GlassAppBar(title: Text(context.l10n.accounts)),
       body: ListView(
         children: [
           for (final account in app.accounts)
@@ -324,7 +324,7 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.favorites)),
+      appBar: GlassAppBar(title: Text(context.l10n.favorites)),
       body: !app.isLoggedIn
           ? const LoginPanel()
           : PagedList<ThreadSummary>(
@@ -359,7 +359,7 @@ class DraftsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.drafts)),
+      appBar: GlassAppBar(title: Text(context.l10n.drafts)),
       body: app.local.drafts.isEmpty
           ? EmptyPanel(
               message: context.l10n.emptyDrafts,
@@ -447,7 +447,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
+        appBar: GlassAppBar(
           title: Text(context.l10n.profile),
           actions: [
             IconButton(
@@ -623,7 +623,7 @@ class UserForumsPage extends StatelessWidget {
   final String userId;
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(context.l10n.followedForums)),
+    appBar: GlassAppBar(title: Text(context.l10n.followedForums)),
     body: PagedList<Forum>(
       load: (page) => AppScope.read(context).api.userForums(userId, page: page),
       itemBuilder: (context, forum, _) => SurfaceCard(

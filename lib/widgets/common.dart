@@ -7,6 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/app_controller.dart';
 import '../core/models.dart';
 import '../l10n/app_localizations.dart';
+import 'glass.dart';
+
+export 'glass.dart';
 
 extension LocalizedContext on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
@@ -98,7 +101,7 @@ Future<String?> textPrompt(
   int maxLines = 1,
 }) async {
   final controller = TextEditingController(text: value);
-  final result = await showDialog<String>(
+  final result = await showGlassDialog<String>(
     context: context,
     builder: (context) => AlertDialog(
       title: Text(title),
@@ -133,7 +136,7 @@ Future<bool> confirmAction(
   String title,
   String message,
 ) async =>
-    await showDialog<bool>(
+    await showGlassDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(title),

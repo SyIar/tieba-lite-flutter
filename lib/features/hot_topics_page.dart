@@ -138,7 +138,7 @@ class HotTopicListPage extends StatelessWidget {
   const HotTopicListPage({super.key});
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(context.l10n.hotTopics)),
+    appBar: GlassAppBar(title: Text(context.l10n.hotTopics)),
     body: PagedList<HotTopic>(
       load: (_) async =>
           PageResult(items: await AppScope.read(context).api.hotTopics()),
@@ -199,7 +199,7 @@ class TopicDiscussionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.topicDiscussion)),
+      appBar: GlassAppBar(title: Text(context.l10n.topicDiscussion)),
       body: PagedList<ThreadSummary>(
         load: (page) =>
             app.api.topicThreads(topic.id, topicName: topic.title, page: page),

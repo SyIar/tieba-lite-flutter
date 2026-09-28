@@ -39,7 +39,7 @@ class _ThemeBackgroundPageState extends State<ThemeBackgroundPage> {
   Widget build(BuildContext context) {
     final settings = AppScope.of(context).settings;
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.backgroundTheme)),
+      appBar: GlassAppBar(title: Text(context.l10n.backgroundTheme)),
       body: ListView(
         children: [
           if (_busy) const LinearProgressIndicator(),

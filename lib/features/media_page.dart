@@ -117,7 +117,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: Colors.black,
-    appBar: AppBar(
+    appBar: GlassAppBar(
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
       title: Text('${_index + 1} / ${widget.images.length}'),
@@ -193,7 +193,7 @@ class _VideoPageState extends State<VideoPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: Colors.black,
-    appBar: AppBar(
+    appBar: GlassAppBar(
       title: Text(context.l10n.video),
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,

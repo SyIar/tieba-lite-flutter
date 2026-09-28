@@ -305,5 +305,9 @@
   "iconDefault": "默认",
   "cacheSizeUnknown": "当前平台无法读取磁盘缓存大小。",
   "clearImageCacheConfirm": "清理浏览时缓存的图片？草稿附件和主题背景会保留。",
-  "serviceCenter": "服务中心"
+  "serviceCenter": "服务中心",
+  "fontFamily": "字体",
+  "systemFont": "系统字体",
+  "notoSans": "无衬线字体",
+  "fontPreview": "字里行间，慢慢读。让每一段文字，都清晰而从容。"
 }

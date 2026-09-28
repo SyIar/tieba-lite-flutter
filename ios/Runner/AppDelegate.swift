@@ -5,6 +5,8 @@ import UIKit
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var iconChannel: FlutterMethodChannel?
   private var iconChangePending = false
+  private var appearanceChannel: FlutterMethodChannel?
+  private var appearanceObservers: [NSObjectProtocol] = []
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -19,12 +21,49 @@ import UIKit
       binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
     iconChannel = channel
+    let appearance = FlutterMethodChannel(
+      name: "org.tblite.flutter/appearance",
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
+    appearanceChannel = appearance
+    appearance.setMethodCallHandler { [weak self] call, result in
+      guard call.method == "settings" else {
+        result(FlutterMethodNotImplemented)
+        return
+      }
+      result(self?.appearanceSettings() ?? [:])
+    }
+    for observer in appearanceObservers {
+      NotificationCenter.default.removeObserver(observer)
+    }
+    appearanceObservers = [
+      UIAccessibility.reduceTransparencyStatusDidChangeNotification,
+      UIAccessibility.reduceMotionStatusDidChangeNotification
+    ].map { notification in
+      NotificationCenter.default.addObserver(forName: notification, object: nil, queue: .main) { [weak self] _ in
+        guard let self = self else { return }
+        self.appearanceChannel?.invokeMethod("changed", arguments: self.appearanceSettings())
+      }
+    }
     channel.setMethodCallHandler { [weak self] call, result in
       guard let self = self else {
         result(FlutterError(code: "unavailable", message: "Icon service unavailable.", details: nil))
         return
       }
       self.handleIconCall(call, result: result)
+    }
+  }
+
+  private func appearanceSettings() -> [String: Bool] {
+    [
+      "reduceTransparency": UIAccessibility.isReduceTransparencyEnabled,
+      "reduceMotion": UIAccessibility.isReduceMotionEnabled
+    ]
+  }
+
+  deinit {
+    for observer in appearanceObservers {
+      NotificationCenter.default.removeObserver(observer)
     }
   }
 

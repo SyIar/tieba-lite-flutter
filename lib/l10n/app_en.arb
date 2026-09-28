@@ -305,5 +305,9 @@
   "iconDefault": "Default",
   "cacheSizeUnknown": "Disk cache size is unavailable on this platform.",
   "clearImageCacheConfirm": "Clear cached viewing images? Draft attachments and your theme background will be kept.",
-  "serviceCenter": "Service center"
+  "serviceCenter": "Service center",
+  "fontFamily": "Font",
+  "systemFont": "System font",
+  "notoSans": "Noto Sans",
+  "fontPreview": "Read slowly, see clearly. Let each line feel natural."
 }

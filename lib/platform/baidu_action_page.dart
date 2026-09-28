@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import '../widgets/glass.dart';
+
 import '../core/models.dart';
 import 'baidu_web_session.dart';
 
@@ -150,7 +152,7 @@ class _BaiduActionPageState extends State<BaiduActionPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
+    appBar: GlassAppBar(
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

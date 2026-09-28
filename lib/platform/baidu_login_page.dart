@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import '../widgets/glass.dart';
 import 'baidu_web_session.dart';
 
 class BaiduCookies {
@@ -184,7 +185,7 @@ class _BaiduLoginPageState extends State<BaiduLoginPage> {
   Widget build(BuildContext context) => PopScope(
     canPop: !_busy,
     child: Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

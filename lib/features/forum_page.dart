@@ -79,7 +79,7 @@ class _ForumPageState extends State<ForumPage> {
     final pinned = _pinnedThreads.where(_showThread).toList();
     final fab = app.settings.getString('forumFabFunction', fallback: 'refresh');
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: Text(widget.name),
         actions: [
           IconButton(
@@ -321,7 +321,7 @@ class _ForumPageState extends State<ForumPage> {
       ),
       floatingActionButton: fab == 'hide' || fab == 'post'
           ? null
-          : FloatingActionButton.small(
+          : GlassFloatingButton.small(
               tooltip: fab == 'back_to_top'
                   ? context.l10n.backToTop
                   : context.l10n.refresh,
@@ -367,7 +367,7 @@ class _ForumInfoPageState extends State<ForumInfoPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(context.l10n.forumInfo)),
+    appBar: GlassAppBar(title: Text(context.l10n.forumInfo)),
     body: ListView(
       padding: const EdgeInsets.only(bottom: 32),
       children: [

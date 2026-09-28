@@ -70,3 +70,9 @@ not require an additional generic asset entry for the same font file.
 Only the static regular weight is bundled. Other requested weights may be synthesized
 by the renderer. No external font download is required at runtime, and no UI-only
 subsetting or third-party font conversion was performed.
+
+## System font default, 2026-09-28
+
+The default `fontFamily=system` leaves the platform font and fallback selection
+to Flutter and iOS. No additional font is downloaded or bundled. The existing
+Noto Sans asset remains an optional setting and the desktop preview font.

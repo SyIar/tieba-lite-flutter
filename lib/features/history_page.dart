@@ -18,7 +18,7 @@ class HistoryPage extends StatelessWidget {
       length: 2,
       child: Builder(
         builder: (context) => Scaffold(
-          appBar: AppBar(
+          appBar: GlassAppBar(
             title: Text(context.l10n.history),
             bottom: TabBar(
               tabs: [

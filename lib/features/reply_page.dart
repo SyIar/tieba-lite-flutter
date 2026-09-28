@@ -103,7 +103,7 @@ class _ReplyPageState extends State<ReplyPage> {
       if (mounted) Navigator.pop(context);
       return;
     }
-    final action = await showDialog<String>(
+    final action = await showGlassDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.leaveDraftTitle),
@@ -292,7 +292,7 @@ class _ReplyPageState extends State<ReplyPage> {
       if (!didPop) _leave();
     },
     child: Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         leading: IconButton(
           onPressed: _sending ? null : _leave,
           icon: const Icon(Icons.close_rounded),
@@ -403,7 +403,7 @@ class _ReplyPageState extends State<ReplyPage> {
                   IconButton(
                     onPressed: _sending
                         ? null
-                        : () => showModalBottomSheet<void>(
+                        : () => showGlassBottomSheet<void>(
                             context: context,
                             builder: (context) => EmoticonPicker(
                               onSelected: (item) => _insertEmoji(item.token),

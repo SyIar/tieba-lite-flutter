@@ -203,7 +203,7 @@ class _ThreadPageState extends State<ThreadPage> {
     final app = AppScope.of(context);
     final thread = _thread;
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: GestureDetector(
           onTap: _forum?.name.isNotEmpty == true
               ? () => openForum(context, _forum!.name)
@@ -361,16 +361,19 @@ class _ThreadPageState extends State<ThreadPage> {
           children: [
             if (thread != null)
               Padding(
-                padding: const EdgeInsets.fromLTRB(22, 16, 22, 14),
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
                 child: Text(
                   thread.title.isEmpty ? context.l10n.noTitle : thread.title,
-                  style: Theme.of(context).textTheme.headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.w800, height: 1.4),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                  ),
                 ),
               ),
             if (app.settings.getBool('showShortcutInThread', fallback: true))
               Padding(
-                padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+                padding: const EdgeInsets.fromLTRB(14, 0, 14, 4),
                 child: Wrap(
                   spacing: 8,
                   children: [
@@ -426,20 +429,9 @@ class _ThreadPageState extends State<ThreadPage> {
       ),
       bottomNavigationBar: _reader
           ? null
-          : SafeArea(
-              top: false,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 8, 12, 10),
-                decoration: BoxDecoration(
-                  color: context.colors.surface,
-                  border: Border(
-                    top: BorderSide(
-                      color: context.colors.outlineVariant.withValues(
-                        alpha: .5,
-                      ),
-                    ),
-                  ),
-                ),
+          : GlassBottomBar(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: Row(
                   children: [
                     Expanded(
@@ -449,7 +441,7 @@ class _ThreadPageState extends State<ThreadPage> {
                         label: Text(context.l10n.reply),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 6),
                     IconButton(
                       onPressed: _busy ? null : _toggleLike,
                       tooltip: context.l10n.like,
@@ -535,9 +527,15 @@ class _PostCardState extends State<PostCard> {
     final app = AppScope.of(context);
     return BlockedContent(
       blocked: app.local.blocksPost(post),
-      child: SurfaceCard(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: context.colors.surface,
+          border: Border(
+            bottom: BorderSide(color: context.colors.outlineVariant, width: .5),
+          ),
+        ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 6),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -548,10 +546,10 @@ class _PostCardState extends State<PostCard> {
                     child: UserAvatar(
                       url: post.author.avatar,
                       name: post.author.name,
-                      radius: 18,
+                      radius: 16,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -565,7 +563,7 @@ class _PostCardState extends State<PostCard> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 1),
                         Text(
                           '${post.floor > 0 ? '#${post.floor} · ' : ''}${shortDate(context, post.createdAt)}',
                           style: TextStyle(
@@ -643,18 +641,21 @@ class _PostCardState extends State<PostCard> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 6),
               PostContent(content: post.content),
               if (post.replies.isNotEmpty &&
                   !app.settings.hideReply &&
                   !widget.readerMode) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: 8),
                 InkWell(
                   onTap: widget.onReplies,
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: context.colors.surfaceContainerHighest.withValues(
                         alpha: .7,
@@ -669,7 +670,7 @@ class _PostCardState extends State<PostCard> {
                             .take(3)
                             .map(
                               (reply) => Padding(
-                                padding: const EdgeInsets.only(bottom: 5),
+                                padding: const EdgeInsets.only(bottom: 3),
                                 child: Text.rich(
                                   TextSpan(
                                     children: [
@@ -688,7 +689,7 @@ class _PostCardState extends State<PostCard> {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 13,
-                                    height: 1.5,
+                                    height: 1.35,
                                   ),
                                 ),
                               ),
@@ -707,44 +708,48 @@ class _PostCardState extends State<PostCard> {
                 ),
               ],
               if (!widget.readerMode) ...[
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (post.replyCount > 0 &&
-                        post.replies.isEmpty &&
-                        widget.onReplies != null)
-                      TextButton(
-                        onPressed: widget.onReplies,
-                        child: Text(
-                          '${context.l10n.floorReplies} ${post.replyCount}',
+                const SizedBox(height: 4),
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 6,
+                    children: [
+                      if (post.replyCount > 0 &&
+                          post.replies.isEmpty &&
+                          widget.onReplies != null)
+                        TextButton(
+                          onPressed: widget.onReplies,
+                          child: Text(
+                            '${context.l10n.floorReplies} ${post.replyCount}',
+                          ),
+                        ),
+                      TextButton.icon(
+                        onPressed: widget.onReply,
+                        icon: const Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 16,
+                        ),
+                        label: Text(context.l10n.reply),
+                      ),
+                      TextButton.icon(
+                        onPressed: _busy ? null : _like,
+                        icon: Icon(
+                          _liked
+                              ? Icons.thumb_up_rounded
+                              : Icons.thumb_up_outlined,
+                          size: 16,
+                        ),
+                        label: Text(
+                          '${post.likeCount + (_liked == post.isLiked
+                                  ? 0
+                                  : _liked
+                                  ? 1
+                                  : -1)}',
                         ),
                       ),
-                    TextButton.icon(
-                      onPressed: widget.onReply,
-                      icon: const Icon(
-                        Icons.chat_bubble_outline_rounded,
-                        size: 16,
-                      ),
-                      label: Text(context.l10n.reply),
-                    ),
-                    TextButton.icon(
-                      onPressed: _busy ? null : _like,
-                      icon: Icon(
-                        _liked
-                            ? Icons.thumb_up_rounded
-                            : Icons.thumb_up_outlined,
-                        size: 16,
-                      ),
-                      label: Text(
-                        '${post.likeCount + (_liked == post.isLiked
-                                ? 0
-                                : _liked
-                                ? 1
-                                : -1)}',
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ],
@@ -822,7 +827,7 @@ class _FloorRepliesPageState extends State<FloorRepliesPage> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.floorReplies)),
+      appBar: GlassAppBar(title: Text(context.l10n.floorReplies)),
       body: PagedList<Post>(
         key: _list,
         load: (page) => app.api.floorReplies(
@@ -847,10 +852,9 @@ class _FloorRepliesPageState extends State<FloorRepliesPage> {
           onReply: () => _reply(post),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        top: false,
+      bottomNavigationBar: GlassBottomBar(
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: FilledButton.icon(
             onPressed: _reply,
             icon: const Icon(Icons.edit_outlined),

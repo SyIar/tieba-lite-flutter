@@ -55,35 +55,38 @@ class _MainShellState extends State<MainShell> {
         onPageChanged: (index) => setState(() => _tab = index),
         children: tabs.map((tab) => _RetainedTab(child: tab)).toList(),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selected,
-        onDestinationSelected: (index) {
-          setState(() => _tab = index);
-          _pages.jumpToPage(index);
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.grid_view_outlined),
-            selectedIcon: const Icon(Icons.grid_view_rounded),
-            label: context.l10n.home,
-          ),
-          if (!hidden)
+      bottomNavigationBar: GlassBottomBar(
+        padding: EdgeInsets.zero,
+        child: NavigationBar(
+          selectedIndex: selected,
+          onDestinationSelected: (index) {
+            setState(() => _tab = index);
+            _pages.jumpToPage(index);
+          },
+          destinations: [
             NavigationDestination(
-              icon: const Icon(Icons.explore_outlined),
-              selectedIcon: const Icon(Icons.explore_rounded),
-              label: context.l10n.explore,
+              icon: const Icon(Icons.grid_view_outlined),
+              selectedIcon: const Icon(Icons.grid_view_rounded),
+              label: context.l10n.home,
             ),
-          NavigationDestination(
-            icon: const Icon(Icons.chat_bubble_outline_rounded),
-            selectedIcon: const Icon(Icons.chat_bubble_rounded),
-            label: context.l10n.notifications,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline_rounded),
-            selectedIcon: const Icon(Icons.person_rounded),
-            label: context.l10n.me,
-          ),
-        ],
+            if (!hidden)
+              NavigationDestination(
+                icon: const Icon(Icons.explore_outlined),
+                selectedIcon: const Icon(Icons.explore_rounded),
+                label: context.l10n.explore,
+              ),
+            NavigationDestination(
+              icon: const Icon(Icons.chat_bubble_outline_rounded),
+              selectedIcon: const Icon(Icons.chat_bubble_rounded),
+              label: context.l10n.notifications,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.person_outline_rounded),
+              selectedIcon: const Icon(Icons.person_rounded),
+              label: context.l10n.me,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -271,7 +274,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: Text(context.l10n.appTitle),
         actions: [
           IconButton(
@@ -555,7 +558,7 @@ class ExplorePage extends StatelessWidget {
       length: 3,
       initialIndex: 1,
       child: Scaffold(
-        appBar: AppBar(
+        appBar: GlassAppBar(
           title: Text(context.l10n.explore),
           actions: [
             IconButton(
@@ -615,7 +618,7 @@ class NotificationsPage extends StatelessWidget {
       length: 2,
       initialIndex: initialTab.clamp(0, 1),
       child: Scaffold(
-        appBar: AppBar(
+        appBar: GlassAppBar(
           title: Text(context.l10n.notifications),
           bottom: TabBar(
             tabs: [

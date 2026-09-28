@@ -220,7 +220,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (!didPop && !_busy) _leave();
     },
     child: Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         leading: IconButton(
           onPressed: _busy ? null : _leave,
           icon: const Icon(Icons.close_rounded),
@@ -393,7 +393,7 @@ class _AvatarCropPageState extends State<_AvatarCropPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
+    appBar: GlassAppBar(
       title: Text(context.l10n.cropAvatar),
       actions: [
         TextButton(

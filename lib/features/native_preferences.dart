@@ -104,7 +104,7 @@ class _AppIconPageState extends State<AppIconPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(context.l10n.appIcon)),
+    appBar: GlassAppBar(title: Text(context.l10n.appIcon)),
     body: FutureBuilder<(bool, String)>(
       future: _state,
       builder: (context, snapshot) {

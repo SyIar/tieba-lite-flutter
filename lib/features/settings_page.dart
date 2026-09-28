@@ -13,7 +13,7 @@ class SettingsPage extends StatelessWidget {
     final app = AppScope.of(context);
     final settings = app.settings;
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.settings)),
+      appBar: GlassAppBar(title: Text(context.l10n.settings)),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 36),
         children: [
@@ -80,7 +80,7 @@ class SettingsPage extends StatelessWidget {
                     child: DropdownButton<String>(
                       value: settings.getString(
                         'darkPalette',
-                        fallback: 'grey_dark',
+                        fallback: 'amoled_dark',
                       ),
                       onChanged: (value) {
                         if (value != null) {
@@ -110,6 +110,37 @@ class SettingsPage extends StatelessWidget {
                   context.l10n.alternatingCards,
                   Icons.table_rows_outlined,
                   fallback: true,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.font_download_outlined),
+                  title: Text(context.l10n.fontFamily),
+                  trailing: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: settings.fontFamily,
+                      onChanged: (value) {
+                        if (value != null) {
+                          settings.setString('fontFamily', value);
+                        }
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: 'system',
+                          child: Text(context.l10n.systemFont),
+                        ),
+                        DropdownMenuItem(
+                          value: 'notoSans',
+                          child: Text(context.l10n.notoSans),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+                  child: Text(
+                    context.l10n.fontPreview,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.text_fields_rounded),
@@ -151,7 +182,7 @@ class SettingsPage extends StatelessWidget {
                     runSpacing: 10,
                     children:
                         [
-                              0xFF167D8D,
+                              0xFF007AFF,
                               0xFF4167A8,
                               0xFF6D529B,
                               0xFFAA4B66,
@@ -165,7 +196,7 @@ class SettingsPage extends StatelessWidget {
                                 selected:
                                     settings.getInt(
                                       'customPrimaryColor',
-                                      fallback: 0xFF167D8D,
+                                      fallback: 0xFF007AFF,
                                     ) ==
                                     color,
                                 child: InkWell(
@@ -308,7 +339,7 @@ class SettingsPage extends StatelessWidget {
                   }),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () async {
-                    final mode = await showModalBottomSheet<String>(
+                    final mode = await showGlassBottomSheet<String>(
                       context: context,
                       builder: (context) => SafeArea(
                         child: Column(
@@ -637,11 +668,11 @@ class _BlockListPageState extends State<BlockListPage> {
         .where((rule) => rule.allow == _allow)
         .toList();
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.privacyAndFilters)),
-      floatingActionButton: FloatingActionButton(
+      appBar: GlassAppBar(title: Text(context.l10n.privacyAndFilters)),
+      floatingActionButton: GlassFloatingButton(
         onPressed: () async {
           final allow = _allow;
-          final kind = await showModalBottomSheet<BlockKind>(
+          final kind = await showGlassBottomSheet<BlockKind>(
             context: context,
             builder: (context) => SafeArea(
               child: Column(
@@ -781,7 +812,7 @@ class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(context.l10n.about)),
+    appBar: GlassAppBar(title: Text(context.l10n.about)),
     body: ListView(
       children: [
         Padding(

@@ -55,7 +55,7 @@ Only options with a connected behavior are exposed. Some reference keys are old 
 | `theme`, `darkTheme`, `followSystemNight` | Adapted to system/light/dark `themeMode` and original grey / blue / AMOLED dark palette choices |
 | `customPrimaryColor` | Native accent palette; root theme uses stored ARGB integer |
 | `toolbarPrimaryColor` | Root theme applies accent-colored toolbar |
-| `fontScale` | Native app text scaling |
+| `fontScale`, Flutter `fontFamily` | Native app text scaling; system font by default, with the existing Noto Sans option, including controls |
 | `radius` | Root theme uses configurable corner radius |
 | `listSingle` | Home list/grid toggle |
 | `hideExplore` | Removes Discover destination |
@@ -97,6 +97,8 @@ Only options with a connected behavior are exposed. Some reference keys are old 
 | `oldTheme`, `userLikeLastRequestUnix` | Internal migration/cache bookkeeping, not user-facing port requirements |
 
 Additional Flutter preferences (`compactCards`, `restoreReading`, `readerMode`, `originalImages`) support the implemented native screens; they do not imply equivalent unimplemented upstream keys.
+
+The 2026-09-28 appearance update adds neutral light/black themes, system appearance migration, compact thread floors, shared glass controls and iOS reduce-transparency/motion handling. Scope, previews and validation are in [APPEARANCE.md](APPEARANCE.md).
 
 ## iOS differences and acceptance
 

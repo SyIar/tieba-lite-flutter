@@ -266,7 +266,7 @@ class _InlinePostTextState extends State<InlinePostText> {
       return SelectionArea(
         child: Text.rich(
           TextSpan(children: spans),
-          style: const TextStyle(height: 1.65),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
       );
     },

@@ -82,7 +82,7 @@ class _SearchPageState extends State<SearchPage> {
     return DefaultTabController(
       length: scoped ? 1 : 3,
       child: Scaffold(
-        appBar: AppBar(
+        appBar: GlassAppBar(
           titleSpacing: 0,
           title: TextField(
             controller: _input,

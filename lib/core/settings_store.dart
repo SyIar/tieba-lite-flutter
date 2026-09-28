@@ -9,6 +9,9 @@ class SettingsStore extends ChangeNotifier {
 
   static const defaults = <String, Object>{
     'themeMode': 'system',
+    'fontFamily': 'system',
+    'darkPalette': 'amoled_dark',
+    'customPrimaryColor': 0xFF007AFF,
     'fontScale': 1.0,
     'hideMedia': false,
     'hideReply': false,
@@ -42,6 +45,12 @@ class SettingsStore extends ChangeNotifier {
 
   Future<void> init() async {
     _preferences ??= await SharedPreferences.getInstance();
+    if (!getBool('monochromeAppearanceV1')) {
+      await setString('themeMode', 'system');
+      await setString('darkPalette', 'amoled_dark');
+      await setInt('customPrimaryColor', 0xFF007AFF);
+      await setBool('monochromeAppearanceV1', true);
+    }
     notifyListeners();
   }
 
@@ -57,6 +66,11 @@ class SettingsStore extends ChangeNotifier {
       _value(key) is num ? (_value(key)! as num).toDouble() : fallback;
 
   String get themeMode => getString('themeMode', fallback: 'system');
+  String get fontFamily {
+    final value = getString('fontFamily');
+    return const {'system', 'notoSans'}.contains(value) ? value : 'system';
+  }
+
   double get fontScale => getDouble('fontScale', fallback: 1).clamp(0.75, 2.0);
   bool get hideMedia => getBool('hideMedia');
   bool get hideReply => getBool('hideReply');
