@@ -115,7 +115,8 @@ struct ImageGallery: View {
             }
           }
         }
-    }.preferredColorScheme(.dark).onAppear { selection = initialIndex }.alert(tr("saveImage"), isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button(tr("done")) {} } message: { Text(error ?? "") }
+    }.background(MediaEdgeBack { dismiss() })
+      .preferredColorScheme(.dark).onAppear { selection = initialIndex }.alert(tr("saveImage"), isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button(tr("done")) {} } message: { Text(error ?? "") }
   }
   private func save(_ url: URL) async {
     let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
@@ -152,7 +153,8 @@ struct NativePlayer: View {
     NavigationStack {
       VideoPlayer(player: player).ignoresSafeArea(edges: .bottom).background(.black)
         .toolbar { ToolbarItem(placement: .topBarLeading) { Button(tr("back"), systemImage: "chevron.left") { dismiss() } }; ToolbarItem(placement: .topBarTrailing) { Button(tr("refresh"), systemImage: "arrow.clockwise") { load() } } }
-    }.onAppear(perform: load).onDisappear { player?.pause(); player = nil }.preferredColorScheme(.dark)
+    }.background(MediaEdgeBack { player?.pause(); dismiss() })
+      .onAppear(perform: load).onDisappear { player?.pause(); player = nil }.preferredColorScheme(.dark)
   }
   private func load() { player?.pause(); player = AVPlayer(url: url); player?.play() }
 }

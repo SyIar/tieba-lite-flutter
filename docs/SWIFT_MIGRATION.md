@@ -58,6 +58,12 @@ Reference: [Protocol Buffers field presence](https://protobuf.dev/programming-gu
 
 ## Verified device package
 
+### Media edge return follow-up
+
+ImageGallery and NativePlayer now install a native left-edge pan recognizer on their full-screen presentation container. A completed rightward swipe invokes the existing dismiss action; video is paused before dismissal and released on disappearance. The screen edge takes precedence over descendant pan gestures, while central gallery paging, image pinch/double-tap zoom and video scrubbing retain their original handlers. Short, reversed and cancelled edge gestures do not dismiss. The modal closing animation is unchanged.
+
+Device acceptance is pending for edge return during image zoom, multiple-image paging, video playback/loading, reopening viewers, and retaining the underlying thread scroll position. No simulator checks are used.
+
 - Version: `0.2.0 (1009)`.
 - Source: `243c0fa1f55fb701098e97022e6d439610f4ea30`.
 - [macOS CI run 36432092117](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36432092117): success. Nine Swift core tests, iPhone Release compilation and package checks passed. No simulator checks ran in this workflow.
