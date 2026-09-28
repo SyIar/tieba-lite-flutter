@@ -11,7 +11,9 @@
 - 浅深色、accent、页码与操作状态通过 channel 更新；其他路由/弹窗覆盖时隐藏原生控件，返回后恢复。原生事件再次依据 Flutter 当前状态检查，避免过期点击触发已禁用操作。
 - 不在每一楼创建原生玻璃视图；正文、图片、登录、接口、最近访问 FIFO、签到和关注人数逻辑未作业务修改。
 
-现有 73 项 Flutter 测试与 Dart 分析通过；另新增的窄屏/两倍字号 iOS 布局测试通过，确认首楼不被顶部栏遮挡、末楼能滚到回复栏上方并能够向上滚动。后续 CI 将运行完整 74 项测试和 Xcode 编译。iPhone 真机视觉、系统触摸效果及帧耗时尚未验收，旧 build 9 保留作为对照。
+本地 Dart 分析、73 项已有测试及新增窄屏/两倍字号 iOS 布局测试通过，确认首楼不被顶部栏遮挡、末楼能滚到回复栏上方并能够向上滚动。[Actions 36421069777](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36421069777) 已通过完整 74 项 Flutter 测试、Dart 分析、仓库检查、Web release、Xcode 26.3 真机编译及 IPA 校验。iPhone 真机视觉、系统触摸效果及帧耗时尚未验收，旧 build 9 保留作为对照。
+
+新版 `0.1.0 (10)` 源码为 `a9d39b437ce86a25141a08587dfea37245fcbaf6`；本地制品 `D:\workspace\sideloadly-setup\TiebaLite-0.1.0-10-unsigned.ipa`，25,761,581 bytes，SHA-256 `ce451ef8439e8df5c5ed2e9cc15c838a66e9c4d217bfecb72e543df126d68d6a`。下载文件与安装目录副本校验一致，Bundle ID 仍为 `org.tblite.flutter.tiebaLite`。本轮尚未签名或安装。
 
 以下各节保留此前 build 9 的实现记录，其中 `BackdropFilter` 描述的是旧版和非 iOS fallback。
 

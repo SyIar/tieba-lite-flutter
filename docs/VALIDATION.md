@@ -114,3 +114,13 @@
 - 登录后的服务端接口与用户主动选择的写操作。
 
 本地 Flutter 测试和 Web 编译不等同于 iOS 编译成功或全部业务验收通过。未执行 Gradle，未新增 Java tests。
+
+## 原生玻璃版 build 10
+
+2026-09-28，[Actions 36421069777](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36421069777) 构建成功，源码 `a9d39b437ce86a25141a08587dfea37245fcbaf6`。74 项 Flutter tests、Dart analyze、仓库检查、Web release、Xcode 26.3 真机编译及 IPA 验证通过。
+
+- 完整 UIKit 底部导航、阅读操作栏、顶部常用按钮和简单菜单；范围与降级说明见 [APPEARANCE.md](APPEARANCE.md)。
+- `D:\workspace\sideloadly-setup\TiebaLite-0.1.0-10-unsigned.ipa`，25,761,581 bytes。
+- SHA-256：`ce451ef8439e8df5c5ed2e9cc15c838a66e9c4d217bfecb72e543df126d68d6a`。
+- 校验 ZIP、arm64 可执行文件、设备平台、App 名称、Bundle ID、build number、源码/run metadata 和 SHA-256，复制到安装目录后再次核对。
+- 本轮仅完成制品交付；签名安装、真机外观、按压反馈和持续滚动表现仍待验收。旧 build 9 已从 IPA metadata 确认并保留。
