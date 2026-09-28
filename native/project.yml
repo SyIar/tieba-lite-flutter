@@ -54,6 +54,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.tblite.flutter.tiebaLite
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIconBlue AppIconDark
 schemes:
   TiebaLite:
     build:

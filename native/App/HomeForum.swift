@@ -29,7 +29,6 @@ struct HomeView: View {
           } label: { Image(systemName: "ellipsis") }
         }
       }.task { await load(); await automaticCheckIn() }.refreshable { await load() }
-      .onChange(of: app.library.recentForums.map(\.name)) { _, _ in }
       .confirmationDialog(tr("signAllConfirm"), isPresented: $checkIn, titleVisibility: .visible) { Button(tr("confirm")) { Task { await app.signAll() } } }
       .alert(tr("openForum"), isPresented: $open) { TextField(tr("forumName"), text: $query); Button(tr("open")) { if let url = URL(string: query), let route = Route.link(url) { target = route } else if !query.trimmingCharacters(in: .whitespaces).isEmpty { target = .forum(query.trimmingCharacters(in: .whitespaces)) } }; Button(tr("cancel"), role: .cancel) {} }
       .navigationDestination(item: $target) { Destination(route: $0) }

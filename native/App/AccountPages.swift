@@ -77,7 +77,7 @@ struct CollectionView: View {
         }
       } else if type == "forums" { ForEach(forums, id: \.name) { ForumRow(forum: $0) } }
       else { ForEach(result.items) { thread in
-        if type == "favorites" { NavigationLink(value: Route.thread(thread.id, thread.anchor, 1, settings.flag("collectThreadSeeLz"))) { VStack(alignment: .leading, spacing: 6) { Text(thread.title); Text(thread.excerpt).font(.caption).lineLimit(2).foregroundStyle(.secondary) } } }
+        if type == "favorites" { NavigationLink { ThreadView(id: thread.id, initialAnchor: thread.anchor, initialPage: 1, initialAuthor: settings.flag("collectThreadSeeLz"), initialReverse: settings.flag("collectThreadDescSort"), resumeHistory: false) } label: { VStack(alignment: .leading, spacing: 6) { Text(thread.title); Text(thread.excerpt).font(.caption).lineLimit(2).foregroundStyle(.secondary) } } }
         else { ThreadCard(thread: thread) }
       } }
       if type != "history" { LoadState(loading: loading, error: error, empty: result.items.isEmpty && forums.isEmpty) { request = UUID() } }
@@ -110,7 +110,7 @@ struct ProfileView: View {
       if let user = profile {
         Section {
           HStack { Avatar(user: user, size: 66); VStack(alignment: .leading, spacing: 5) { Text(user.name).font(.title3.bold()); Text(user.intro).font(.subheadline).foregroundStyle(.secondary) } }.padding(.vertical, 8)
-          HStack { Text("\(tr("followers")) \(user.followers.formatted())"); Spacer(); Text("\(tr("follows")) \(user.follows.formatted())"); Spacer(); Text("\(tr("posts")) \(user.posts.formatted())") }.font(.caption)
+          HStack { Text("\(tr("followers")) \(user.followers.formatted())"); Spacer(); Text("\(tr("following")) \(user.follows.formatted())"); Spacer(); Text("\(tr("posts")) \(user.posts.formatted())") }.font(.caption)
           if app.activeID == user.id { Button(tr("editProfile")) { editing = true } }
           else { Button(tr(user.following ? "unfollow" : "follow")) { app.requireLogin { Task { @MainActor in do { try await app.api.follow(user, enabled: !user.following); request = UUID() } catch { app.error = error.localizedDescription } } } } }
         }

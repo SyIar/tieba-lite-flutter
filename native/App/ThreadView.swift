@@ -19,6 +19,7 @@ struct ThreadView: View {
   let initialPage: Int
   let initialAuthor: Bool
   var initialReverse = false
+  var resumeHistory = true
   @EnvironmentObject private var app: AppState
   @EnvironmentObject private var settings: Preferences
   @State private var result = PageResult<Post>()
@@ -78,7 +79,7 @@ struct ThreadView: View {
         .task(id: request) {
           if !initialized {
             initialized = true; page = initialPage; anchor = initialAnchor; onlyAuthor = initialAuthor; reverse = initialReverse; reader = settings.flag("readerMode")
-            if initialAnchor.isEmpty, settings.flag("restoreReading"), let record = app.library.rows("history").first(where: { string($0["threadId"]) == id }) {
+            if resumeHistory, initialAnchor.isEmpty, settings.flag("restoreReading"), let record = app.library.rows("history").first(where: { string($0["threadId"]) == id }) {
               page = max(1, integer(record["page"])); anchor = string(record["lastPostId"]); onlyAuthor = boolean(record["onlyAuthor"])
             }
           }

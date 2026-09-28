@@ -10,8 +10,30 @@ checkout = root / 'native/.build/checkouts/swift-protobuf'
 subprocess.run(['swift', 'package', '--package-path', str(root / 'native'), 'resolve'], check=True)
 subprocess.run(['swift', 'build', '--package-path', str(checkout), '-c', 'release', '--product', 'protoc-gen-swift'], check=True)
 plugin = checkout / '.build/release/protoc-gen-swift'
-files = sorted((root / 'proto').rglob('*.proto'))
-subprocess.run(['protoc', f'--plugin=protoc-gen-swift={plugin}', '-I', str(root / 'proto'),
+schema = root / 'native/.build/native-schema'
+files = []
+scalar = re.compile(r'^(\s*)((?:u?int|sint|fixed|sfixed)(?:32|64)|bool|string|bytes|double|float)(\s+\w+\s*=)')
+for source in sorted((root / 'proto').rglob('*.proto')):
+    # Dart retains explicitly assigned zero values. Preserve request field
+    # presence in Swift without changing field numbers or wire types.
+    lines = []
+    depth = 0
+    messages = []
+    for line in source.read_text().splitlines():
+        declaration = re.match(r'\s*message\s+(\w+)\s*\{', line)
+        if declaration:
+            messages.append((depth, declaration.group(1)))
+        if any('Request' in name for _, name in messages):
+            line = scalar.sub(r'\1optional \2\3', line)
+        lines.append(line)
+        depth += line.count('{') - line.count('}')
+        while messages and depth <= messages[-1][0]:
+            messages.pop()
+    target = schema / source.relative_to(root / 'proto')
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text('\n'.join(lines) + '\n')
+    files.append(target)
+subprocess.run(['protoc', f'--plugin=protoc-gen-swift={plugin}', '-I', str(schema),
                 f'--swift_out={output}', '--swift_opt=FileNaming=PathToUnderscores', '--swift_opt=UseAccessLevelOnImports=false',
                 *map(str, files)], check=True)
 

@@ -1,5 +1,11 @@
 # Native Swift migration
 
+## Protocol compatibility
+
+The Swift generator uses the existing `.proto` field numbers and types. A temporary build-only schema adds explicit scalar presence to request messages, including `CommonRequest`: the legacy Dart implementation serializes assigned zero values, while SwiftProtobuf otherwise omits implicit proto3 defaults. The `pn=0` anchor request fixture detects this distinction. Generated schema copies stay under `native/.build`; original shared schemas are unchanged.
+
+Reference: [Protocol Buffers field presence](https://protobuf.dev/programming-guides/field_presence/). Explicit presence preserves assigned defaults; Dart is a documented exception among proto3 APIs. Legacy binary fixtures verify the actual request encoding and response mapping.
+
 用户确认仅使用 iOS，授权迁移到 Swift + SwiftUI / UIKit。
 
 ## Acceptance contract

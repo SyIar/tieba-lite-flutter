@@ -7,6 +7,7 @@ struct SettingsView: View {
   @State private var cacheSize = 0
   @State private var clearing = false
   @State private var background: PhotosPickerItem?
+  @State private var appIcon = "default"
   private let reading: [(String, String)] = [
     ("compactCards", "compactCards"), ("hideMedia", "hide"), ("hideReply", "hideReply"), ("blockVideo", "hideVideo"),
     ("imageDarkenWhenNightMode", "imageDarken"), ("homePageShowHistoryForum", "showRecentForums"), ("restoreReading", "restoreReading"),
@@ -31,6 +32,9 @@ struct SettingsView: View {
         HStack { Text(tr("cornerRadius")); Slider(value: Binding(get: { settings.number("radius") }, set: { settings.set("radius", $0) }), in: 8...28) }
         Toggle(tr("hideExplore"), isOn: settings.toggle("hideExplore"))
         NavigationLink(tr("backgroundTheme")) { BackgroundSettings() }
+        if UIApplication.shared.supportsAlternateIcons {
+          Picker(tr("appIcon"), selection: $appIcon) { Text(tr("iconDefault")).tag("default"); Text(tr("iconBlue")).tag("blue"); Text(tr("iconDark")).tag("dark") }
+        }
       }
       Section(tr("reading")) {
         ForEach(reading, id: \.0) { key, label in Toggle(tr(label), isOn: settings.toggle(key)) }
@@ -40,7 +44,7 @@ struct SettingsView: View {
       Section(tr("reply")) {
         TextField(tr("signature"), text: settings.stringBinding("littleTail"), axis: .vertical)
         Toggle(tr("replyWarningTitle"), isOn: settings.toggle("postOrReplyWarning"))
-        Toggle(tr("originalImages"), isOn: settings.toggle("originalImages"))
+        Toggle(tr("originalImage"), isOn: settings.toggle("originalImages"))
         Picker(tr("watermark"), selection: settings.stringBinding("picWatermarkType")) { Text(tr("watermarkNone")).tag("0"); Text(tr("watermarkUsername")).tag("1"); Text(tr("watermarkForum")).tag("2") }
       }
       Section { Toggle(tr("autoCheckIn"), isOn: settings.toggle("autoSign")); if settings.flag("autoSign") { DatePicker(tr("autoCheckIn"), selection: Binding(get: { time }, set: { let formatter = DateFormatter(); formatter.dateFormat = "HH:mm"; settings.set("autoSignTime", formatter.string(from: $0)) }), displayedComponents: .hourAndMinute) }; Toggle(tr("slowCheckIn"), isOn: settings.toggle("signSlowMode")); Toggle(tr("officialBatchCheckIn"), isOn: settings.toggle("oksignUseOfficialOksign")) } header: { Text(tr("checkIn")) } footer: { Text(tr("autoCheckInBody")) }
@@ -56,7 +60,12 @@ struct SettingsView: View {
         Link(tr("upstreamProject"), destination: URL(string: "https://github.com/HuanCheng65/TiebaLite")!)
         NavigationLink(tr("licenses")) { LicenseView() }
       }
-    }.navigationTitle(tr("settings")).task { cacheSize = PictureCache.shared.bytes }
+    }.navigationTitle(tr("settings")).task { cacheSize = PictureCache.shared.bytes; appIcon = UIApplication.shared.alternateIconName == "AppIconBlue" ? "blue" : UIApplication.shared.alternateIconName == "AppIconDark" ? "dark" : "default" }
+      .onChange(of: appIcon) { _, choice in
+        let name = choice == "blue" ? "AppIconBlue" : choice == "dark" ? "AppIconDark" : nil
+        guard UIApplication.shared.alternateIconName != name else { return }
+        UIApplication.shared.setAlternateIconName(name) { error in if let error { Task { @MainActor in app.error = error.localizedDescription } } }
+      }
       .confirmationDialog(tr("clearImageCacheConfirm"), isPresented: $clearing, titleVisibility: .visible) { Button(tr("clearImageCache"), role: .destructive) { do { try PictureCache.shared.clear(); cacheSize = PictureCache.shared.bytes } catch { app.error = error.localizedDescription } } }
   }
   private var time: Date { let formatter = DateFormatter(); formatter.dateFormat = "HH:mm"; return formatter.date(from: settings.text("autoSignTime")) ?? formatter.date(from: "09:00")! }

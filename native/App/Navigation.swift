@@ -14,6 +14,9 @@ enum Route: Hashable {
       case "forum": guard parts.count <= 1 else { return nil }; let name = parts.first ?? value("kw"); return name.isEmpty ? nil : .forum(name)
       case "user": let id = parts.first ?? value("uid"); return parts.count <= 1 && validID(id) ? .user(id) : nil
       case "notifications": return .inbox
+      case "history": return .collection("history")
+      case "favorite", "favorites": return .collection("favorites")
+      case "search": return .search("")
       default: return nil
       }
     }
@@ -73,6 +76,10 @@ struct AppRoot: View {
       }
     }
     .onOpenURL { url in if let target = Route.link(url) { deepLink = target } else { app.error = tr("invalidLink") } }
+    .environment(\.openURL, OpenURLAction { url in
+      if let route = Route.link(url) { deepLink = route; return .handled }
+      return .systemAction
+    })
   }
   private func navigation<Content: View>(@ViewBuilder content: () -> Content) -> some View { NavigationStack { content().navigationDestination(for: Route.self) { Destination(route: $0) } } }
 }

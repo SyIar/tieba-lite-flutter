@@ -1,6 +1,8 @@
 import SwiftUI
 import PhotosUI
 import CryptoKit
+import ImageIO
+import UniformTypeIdentifiers
 
 enum DraftFiles {
   static var folder: URL { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("draft_images") }
@@ -11,11 +13,13 @@ enum DraftFiles {
     return FileManager.default.fileExists(atPath: file.path) ? file : nil
   }
   static func retain(_ data: Data) throws -> URL {
-    guard data.count <= 20 * 1024 * 1024, let image = UIImage(data: data), let jpeg = image.jpegData(compressionQuality: 0.95) else { throw APIError(message: tr("imageUnsupported")) }
+    guard data.count <= 20 * 1024 * 1024, UIImage(data: data) != nil, let source = CGImageSourceCreateWithData(data as CFData, nil), let type = CGImageSourceGetType(source) else { throw APIError(message: tr("imageUnsupported")) }
+    let ext = UTType(type as String)?.preferredFilenameExtension?.lowercased() ?? ""
+    guard ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif"].contains(ext) else { throw APIError(message: tr("imageUnsupported")) }
     try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-    let name = SHA256.hash(data: jpeg).map { String(format: "%02x", $0) }.joined() + ".jpg"
+    let name = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() + "." + ext
     let file = folder.appendingPathComponent(name)
-    if !FileManager.default.fileExists(atPath: file.path) { try jpeg.write(to: file, options: .atomic) }
+    if !FileManager.default.fileExists(atPath: file.path) { try data.write(to: file, options: .atomic) }
     return file
   }
   static func upload(_ file: URL) throws -> (Data, Int, Int) {
