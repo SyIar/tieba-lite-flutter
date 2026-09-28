@@ -1,5 +1,13 @@
 # 验证记录
 
+## 当前原生 Swift 版本
+
+`0.2.0 (1009)` 已通过 [macOS CI run 36432092117](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36432092117)：9 项 Swift core 测试、iPhone arm64 Release 编译和 IPA 完整性／资源／无 Flutter runtime 检查。安装包已下载到 `D:\workspace\sideloadly-setup\TiebaLite-0.2.0-1009-unsigned.ipa`，校验值和迁移范围见 [SWIFT_MIGRATION.md](SWIFT_MIGRATION.md)。
+
+按用户要求，最终流程不运行模拟器校验，由用户真机测试。当前原生版本尚未安装验收；下面保留的旧 Flutter 记录不代表 Swift 版本已经通过相同验收。
+
+## 旧 Flutter 版本记录
+
 更新日期：2026-09-28。上游基线见 `FEATURE_MATRIX.md`，工具链固定为 Flutter 3.47.5 / Dart 3.13.4。
 
 ## 已完成

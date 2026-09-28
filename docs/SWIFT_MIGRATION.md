@@ -55,3 +55,14 @@ Reference: [Protocol Buffers field presence](https://protobuf.dev/programming-gu
 - The iPhone IPA stays unsigned for Sideloadly; no Apple account, certificate or provisioning profile is supplied to CI.
 - Device acceptance still required: same-account Sideloadly upgrade, Keychain and draft continuity, live login, authenticated operations, media and visual/scrolling quality. No authenticated account writes were performed during this migration.
 - Previous Flutter version acceptance cannot be applied to this native version. This is a native migration build for upgrade verification, not a claim that every live endpoint has been re-accepted.
+
+## Verified device package
+
+- Version: `0.2.0 (1009)`.
+- Source: `243c0fa1f55fb701098e97022e6d439610f4ea30`.
+- [macOS CI run 36432092117](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36432092117): success. Nine Swift core tests, iPhone Release compilation and package checks passed. No simulator checks ran in this workflow.
+- Downloaded package: `D:\workspace\sideloadly-setup\TiebaLite-0.2.0-1009-unsigned.ipa`.
+- SHA-256: `af70fb9c59f87c857f9f2fd87c6567d6b1e4ff7ba71fc57fde7c8fb05047f56b`.
+- Size: `4,375,250` bytes.
+- Local verification: intact ZIP, arm64 executable, original bundle identifier, correct display name/version, AppIcon/localization/emoticon/license resources and `tblite` scheme, no Flutter runtime.
+- Not installed by this task. The user will perform iPhone acceptance. An in-place upgrade using the same Sideloadly account allows migration testing without first deleting old data.
