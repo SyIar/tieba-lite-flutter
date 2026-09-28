@@ -59,6 +59,7 @@ __pycache__/
 *.pyc
 native/build/
 native/simulator-build/
+native/Support/Info.plist
 native/*.xcodeproj/
 native/Core/Generated/
 native/Core/ProtoCodec.swift
