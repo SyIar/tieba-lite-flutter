@@ -18,7 +18,7 @@ subprocess.run(['protoc', f'--plugin=protoc-gen-swift={plugin}', '-I', str(root 
 # Read the generated declarations instead of assuming package-name casing.
 types = {}
 for path in output.glob('*.swift'):
-    for match in re.finditer(r'^struct (\w+).*?\n', path.read_text(), re.M):
+    for match in re.finditer(r'\bstruct\s+(\w+)\s*[:{]', path.read_text()):
         types[match.group(1).split('_')[-1]] = match.group(1)
 codecs = ['FrsPage', 'PbPage', 'PbFloor', 'Personalized', 'UserLike', 'HotThreadList', 'TopicList',
           'SearchSug', 'Profile', 'UserPost', 'GetForumDetail', 'ForumRuleDetail', 'AddPost']
