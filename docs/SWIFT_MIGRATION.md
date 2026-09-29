@@ -58,6 +58,8 @@ Reference: [Protocol Buffers field presence](https://protobuf.dev/programming-gu
 
 ## Verified device package
 
+Latest native style follow-up: [forum layout and reply colors, build 1011](NATIVE_LAYOUT_FIXES.md). It passed the nine core tests and iPhone Release build; visual acceptance remains with the user.
+
 ### Media edge return follow-up
 
 ImageGallery and NativePlayer now install a native left-edge pan recognizer on their full-screen presentation container. A completed rightward swipe invokes the existing dismiss action; video is paused before dismissal and released on disappearance. The screen edge takes precedence over descendant pan gestures, while central gallery paging, image pinch/double-tap zoom and video scrubbing retain their original handlers. Short, reversed and cancelled edge gestures do not dismiss. The modal closing animation is unchanged.

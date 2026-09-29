@@ -27,3 +27,13 @@ Physical-device acceptance:
 3. Check that the bottom tab bar is absent inside the forum/thread and page controls can be tapped; return to Home and verify tabs reappear.
 4. Open a nested-reply preview in light and dark appearances: author accent and body black/white remain distinct. Tapping it still opens Floor replies.
 5. Verify follow/check-in completion, first/last page disabled states, pull-to-refresh, filter changes and Back to top with the existing account.
+
+## Verified package
+
+- Version: `Tieba Lite 0.2.0 (1011)`.
+- Source: `b4ef31da8c61bd8c60b03e6dff485c7a807f310b`.
+- [macOS run 36521683265](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36521683265) passed source/localization policy, Swift syntax, all nine existing core tests, iPhone arm64 Release compilation and packaging. No simulator checks ran.
+- IPA: `D:\workspace\sideloadly-setup\TiebaLite-0.2.0-1011-unsigned.ipa`.
+- SHA-256: `3fe6cbaba80e3af69061f703f75b5ca87adad6fbbd46d8d590ff971885e180ee`; size `4,410,146` bytes.
+- Local verification: build/source metadata, checksum, intact ZIP, arm64 executable, original bundle identifier, version/display name, app icon, localization, emoticons, license and `tblite` deep-link scheme; no Flutter runtime. The install-directory copy has the same checksum.
+- Installation and visual acceptance remain pending on the user's iPhone.
