@@ -128,11 +128,12 @@ struct Pagination: ToolbarContent {
   var body: some ToolbarContent {
     ToolbarItemGroup(placement: .bottomBar) {
       Button(tr("back"), systemImage: "chevron.left", action: previous).disabled(page <= 1 || loading)
-      Spacer()
       Button { jump?() } label: { Text("\(tr("page")) \(page)").font(.subheadline.weight(.semibold)).monospacedDigit() }.disabled(jump == nil || loading)
-      Spacer()
-      Button(tr("refresh"), systemImage: "arrow.clockwise", action: refresh).disabled(loading)
       Button(tr("loadMore"), systemImage: "chevron.right", action: next).disabled(!more || loading)
+    }
+    ToolbarSpacer(.flexible, placement: .bottomBar)
+    ToolbarItem(placement: .bottomBar) {
+      Button(tr("refresh"), systemImage: "arrow.clockwise", action: refresh).disabled(loading)
     }
   }
 }
@@ -169,6 +170,7 @@ struct ForumRow: View {
 }
 struct ThreadCard: View {
   let thread: ThreadSummary
+  var standalone = false
   @EnvironmentObject private var app: AppState
   @EnvironmentObject private var settings: Preferences
   @State private var revealed = false
@@ -183,7 +185,13 @@ struct ThreadCard: View {
             if !thread.title.isEmpty { Text(thread.title).fontWeight(.semibold).lineLimit(3) }
             if !thread.pinned {
               if !thread.excerpt.isEmpty { Text(thread.excerpt).font(.subheadline).lineLimit(settings.flag("compactCards") ? 2 : 3).foregroundStyle(.secondary) }
-              if !settings.flag("hideMedia") && !thread.images.isEmpty { HStack(spacing: 5) { ForEach(Array(thread.images.prefix(3)), id: \.self) { url in RemotePicture(url: url, thumbnail: nil, preview: true).frame(height: 88).clipped() } } }
+              if !settings.flag("hideMedia") && !thread.images.isEmpty {
+                HStack(spacing: 6) {
+                  ForEach(Array(thread.images.prefix(3)), id: \.self) { url in
+                    RemotePicture(url: url, thumbnail: nil, preview: true).frame(maxWidth: .infinity).frame(height: 88).allowsHitTesting(false)
+                  }
+                }
+              }
               HStack(spacing: 6) {
                 Text(thread.author.name.isEmpty ? tr("unknownUser") : thread.author.name).lineLimit(1)
                 if !thread.forum.name.isEmpty { Text("\u{00B7} " + thread.forum.name).lineLimit(1) }
@@ -191,8 +199,11 @@ struct ThreadCard: View {
                 Image(systemName: "bubble.right"); Text(thread.replies.formatted())
               }.font(.caption).foregroundStyle(.secondary)
             }
-          }.foregroundStyle(.primary).padding(.vertical, 4)
-        }.contextMenu {
+          }.foregroundStyle(Color(uiColor: .label)).frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 4).padding(standalone ? 12 : 0)
+            .background(standalone ? Color(uiColor: .secondarySystemGroupedBackground) : .clear, in: RoundedRectangle(cornerRadius: 16))
+            .contentShape(Rectangle())
+        }.buttonStyle(.plain).contextMenu {
           NavigationLink(value: Route.user(thread.author.id)) { Label(tr("viewProfile"), systemImage: "person") }
           Button(tr("hide"), systemImage: "eye.slash") { app.updateLibrary { $0.addBlock(kind: "thread", value: thread.id, label: thread.title) } }
           ShareLink(item: URL(string: "https://tieba.baidu.com/p/\(thread.id)")!) { Label(tr("share"), systemImage: "square.and.arrow.up") }

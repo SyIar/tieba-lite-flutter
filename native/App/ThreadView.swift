@@ -60,6 +60,7 @@ struct ThreadView: View {
         }.padding(.horizontal, 10).padding(.bottom, 12)
       }.coordinateSpace(name: "posts").background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle(result.forum?.name ?? tr("threads")).navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .toolbar {
           ToolbarItemGroup(placement: .topBarTrailing) {
             if !reader { Button(tr("reply"), systemImage: "square.and.pencil") { app.requireLogin { reply = ReplyContext(thread: id, forum: result.forum ?? Forum()) } }.disabled(result.forum == nil) }
@@ -157,19 +158,30 @@ struct PostCard: View {
         if !reader && !settings.flag("hideReply") {
           let replies = post.replies.filter { !app.library.blocked(user: $0.author, text: $0.plainText) }
           if !replies.isEmpty {
-            VStack(alignment: .leading, spacing: 5) { ForEach(replies) { item in Button { nested = true } label: { (Text(item.author.name + ": ").bold() + Text(item.plainText)).font(.caption).lineLimit(3).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading) } }
-              if post.replyCount > replies.count { Button("\(tr("viewReplies")) \(post.replyCount)") { nested = true }.font(.caption) }
+            VStack(alignment: .leading, spacing: 6) {
+              ForEach(replies) { item in
+                Button { nested = true } label: {
+                  (Text((item.author.name.isEmpty ? tr("unknownUser") : item.author.name) + ": ").bold().foregroundColor(settings.accent)
+                   + Text(item.plainText).foregroundColor(Color(uiColor: .label)))
+                    .font(.caption).lineLimit(3).multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
+                }.buttonStyle(.plain)
+              }
+              if post.replyCount > replies.count {
+                Button("\(tr("viewReplies")) \(post.replyCount)") { nested = true }
+                  .font(.caption).buttonStyle(.plain).foregroundStyle(settings.accent)
+              }
             }.padding(10).background(Color(uiColor: .tertiarySystemFill), in: RoundedRectangle(cornerRadius: 10))
           } else if post.replyCount > 0 { Button("\(tr("viewReplies")) \(post.replyCount)") { nested = true }.font(.caption) }
         }
         HStack {
           if !reader {
-            Button { perform { let undo = liked ?? post.liked; try await app.api.agree(thread: post.threadID, post: post.id, forum: forum.id, undo: undo); liked = !undo; likes = max(0, (likes ?? post.likes) + (undo ? -1 : 1)) } } label: { Label((likes ?? post.likes).formatted(), systemImage: (liked ?? post.liked) ? "hand.thumbsup.fill" : "hand.thumbsup") }.disabled(busy)
+            Button { perform { let undo = liked ?? post.liked; try await app.api.agree(thread: post.threadID, post: post.id, forum: forum.id, undo: undo); liked = !undo; likes = max(0, (likes ?? post.likes) + (undo ? -1 : 1)) } } label: { Label((likes ?? post.likes).formatted(), systemImage: (liked ?? post.liked) ? "hand.thumbsup.fill" : "hand.thumbsup").foregroundStyle((liked ?? post.liked) ? settings.accent : Color(uiColor: .secondaryLabel)) }.disabled(busy)
             Button(tr("reply"), systemImage: "arrowshape.turn.up.left") { app.requireLogin { reply(ReplyContext(thread: post.threadID, forum: forum, parent: post.parentID.isEmpty ? post.id : post.parentID, subpost: post.parentID.isEmpty ? "" : post.id, replyUser: post.author.id)) } }
           }
           Spacer()
           if let date = post.time { Text(date, style: .relative).font(.caption2).foregroundStyle(.secondary) }
-        }.font(.caption).foregroundStyle(.secondary).padding(.top, 2)
+        }.font(.caption).buttonStyle(.plain).foregroundStyle(Color(uiColor: .secondaryLabel)).padding(.top, 2)
       }.padding(12).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: max(8, settings.number("radius"))))
         .sheet(isPresented: $nested) { NavigationStack { FloorView(thread: post.threadID, post: post.id, forum: forum).toolbar { ToolbarItem(placement: .cancellationAction) { Button(tr("close")) { nested = false } } } } }
         .sheet(item: Binding(get: { actionURL.map(URLItem.init) }, set: { actionURL = $0?.url })) { item in BaiduBrowser(session: app.session, url: item.url) { result in actionURL = nil; if case .failure(let error) = result { app.error = error.localizedDescription } }.ignoresSafeArea() }

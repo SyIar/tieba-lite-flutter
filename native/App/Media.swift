@@ -70,12 +70,21 @@ struct RemotePicture: View {
   var body: some View {
     Group {
       if let image {
-        Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: preview ? 120 : 460)
-          .opacity(scheme == .dark && settings.flag("imageDarkenWhenNightMode") ? 0.8 : 1).onTapGesture { if let open { open() } else if !preview { showing = true } }
+        Group {
+          if preview {
+            GeometryReader { geometry in
+              Image(uiImage: image).resizable().scaledToFill().frame(width: geometry.size.width, height: geometry.size.height).clipped()
+            }.frame(height: 88)
+          } else {
+            Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: 460)
+              .onTapGesture { if let open { open() } else { showing = true } }
+          }
+        }.opacity(scheme == .dark && settings.flag("imageDarkenWhenNightMode") ? 0.8 : 1)
       } else {
         ZStack {
           Color(uiColor: .tertiarySystemFill)
           if loading { ProgressView() }
+          else if preview { Image(systemName: "photo").foregroundStyle(Color(uiColor: .secondaryLabel)) }
           else { Button(tr(manual || automatic ? "retry" : "tapToLoad"), systemImage: "photo") { manual = true; attempt += 1 }.font(.caption) }
         }.frame(height: preview ? 88 : 160)
       }
