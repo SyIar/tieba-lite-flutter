@@ -17,6 +17,12 @@ assert not any(p.name in {'Flutter.framework', 'App.framework', 'flutter_assets'
 assert (app / 'app_zh.arb').is_file(), 'Missing Chinese localization'
 assert (app / 'Assets.car').is_file() and info.get('CFBundleIcons'), 'Missing app icon'
 assert (app / 'emoticons').is_dir(), 'Missing emoticon assets'
+from prepare_native_fonts import folder, manifest, valid
+assert sorted(info.get('UIAppFonts', [])) == sorted(manifest['files']), 'Missing bundled font registration'
+for name, expected in manifest['files'].items():
+    assert valid((app / name).read_bytes(), expected), f'Invalid bundled font: {name}'
+    assert (app / name).read_bytes() == (folder / name).read_bytes(), f'Font changed during packaging: {name}'
+assert (app / 'SourceHanSerif-LICENSE.txt').is_file(), 'Missing font license'
 assert info['CFBundleURLTypes'][0]['CFBundleURLSchemes'] == ['tblite'], 'Missing deep links'
 output = Path('artifacts/native')
 output.mkdir(parents=True, exist_ok=True)

@@ -146,6 +146,7 @@ enum SecureAccounts {
 
 @main struct TiebaLiteApp: App {
   @StateObject private var app = AppState()
+  init() { AppTypography.configureNavigation() }
   var body: some Scene {
     WindowGroup {
       AppRoot().environmentObject(app).environmentObject(app.settings)

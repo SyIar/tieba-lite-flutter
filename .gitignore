@@ -63,3 +63,5 @@ native/Support/Info.plist
 native/*.xcodeproj/
 native/Core/Generated/
 native/Core/ProtoCodec.swift
+native/Resources/Fonts/*.otf
+native/Resources/Fonts/*.download

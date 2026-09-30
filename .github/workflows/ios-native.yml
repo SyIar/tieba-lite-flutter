@@ -24,6 +24,8 @@ jobs:
       - run: xcodebuild -version
       - run: python3 scripts/check_repository.py
       - run: xcrun swiftc -frontend -parse native/App/*.swift native/Core/*.swift
+      - run: python3 scripts/prepare_native_fonts.py
+      - run: python3 scripts/check_native_fonts.py
       - run: brew install protobuf xcodegen
       - run: python3 scripts/generate_native_protos.py
       - run: swift test --package-path native

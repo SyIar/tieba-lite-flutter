@@ -51,7 +51,7 @@ struct AppRoot: View {
         Image(uiImage: image).resizable().scaledToFill().blur(radius: settings.number("translucentBackgroundBlur")).overlay(Color(uiColor: .systemBackground).opacity(settings.number("nativeSurfaceOpacity") == 0 ? 0.9 : settings.number("nativeSurfaceOpacity"))).ignoresSafeArea()
       }
     }
-    .font(.system(size: 16 * settings.fontScale))
+    .tiebaFont(.body, baseSize: 16)
     .overlay { if validating { ProgressView(tr("loading")).padding(24).glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20)) } }
     .sheet(isPresented: $app.login) {
       BaiduBrowser(session: nil) { result in
@@ -128,7 +128,7 @@ struct Pagination: ToolbarContent {
   var body: some ToolbarContent {
     ToolbarItemGroup(placement: .bottomBar) {
       Button(tr("back"), systemImage: "chevron.left", action: previous).disabled(page <= 1 || loading)
-      Button { jump?() } label: { Text("\(tr("page")) \(page)").font(.subheadline.weight(.semibold)).monospacedDigit() }.disabled(jump == nil || loading)
+      Button { jump?() } label: { Text("\(tr("page")) \(page)").tiebaFont(.subheadline, weight: .semibold).monospacedDigit() }.disabled(jump == nil || loading)
       Button(tr("loadMore"), systemImage: "chevron.right", action: next).disabled(!more || loading)
     }
     ToolbarSpacer(.flexible, placement: .bottomBar)
@@ -159,7 +159,7 @@ struct ForumRow: View {
             if let members = forum.members { Text("\(tr("members")) \(members.formatted())") }
             if forum.level > 0 { Text("Lv.\(forum.level)") }
             if forum.following { Text(tr(forum.signed ? "checkedIn" : "notCheckedIn")) }
-          }.font(.caption).foregroundStyle(.secondary)
+          }.tiebaFont(.caption).foregroundStyle(.secondary)
         }
       }.padding(.vertical, 3)
     }.contextMenu {
@@ -178,13 +178,13 @@ struct ThreadCard: View {
   var body: some View {
     if !(settings.flag("blockVideo") && thread.video != nil) {
       if blocked && !revealed {
-        if !settings.flag("hideBlockedContent") && settings.flag("showBlockTip") { Button(tr("contentHidden")) { revealed = true }.font(.caption).foregroundStyle(.secondary) }
+        if !settings.flag("hideBlockedContent") && settings.flag("showBlockTip") { Button(tr("contentHidden")) { revealed = true }.tiebaFont(.caption).foregroundStyle(.secondary) }
       } else {
         NavigationLink(value: Route.thread(thread.id, thread.anchor, 1, false)) {
           VStack(alignment: .leading, spacing: settings.flag("compactCards") ? 5 : 8) {
-            if !thread.title.isEmpty { Text(thread.title).fontWeight(.semibold).lineLimit(3) }
+            if !thread.title.isEmpty { Text(thread.title).tiebaFont(.body, weight: .semibold, baseSize: 16).lineLimit(3) }
             if !thread.pinned {
-              if !thread.excerpt.isEmpty { Text(thread.excerpt).font(.subheadline).lineLimit(settings.flag("compactCards") ? 2 : 3).foregroundStyle(.secondary) }
+              if !thread.excerpt.isEmpty { Text(thread.excerpt).tiebaFont(.subheadline).lineLimit(settings.flag("compactCards") ? 2 : 3).foregroundStyle(.secondary) }
               if !settings.flag("hideMedia") && !thread.images.isEmpty {
                 HStack(spacing: 6) {
                   ForEach(Array(thread.images.prefix(3)), id: \.self) { url in
@@ -197,7 +197,7 @@ struct ThreadCard: View {
                 if !thread.forum.name.isEmpty { Text("\u{00B7} " + thread.forum.name).lineLimit(1) }
                 Spacer(minLength: 0)
                 Image(systemName: "bubble.right"); Text(thread.replies.formatted())
-              }.font(.caption).foregroundStyle(.secondary)
+              }.tiebaFont(.caption).foregroundStyle(.secondary)
             }
           }.foregroundStyle(Color(uiColor: .label)).frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 4).padding(standalone ? 12 : 0)

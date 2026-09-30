@@ -39,9 +39,9 @@ struct HomeView: View {
     else { LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 14) { ForEach(visible, id: \.name) { forum in
       NavigationLink(value: Route.forum(forum.name)) {
         VStack(spacing: 7) {
-          AsyncImage(url: safeURL(forum.avatar)) { $0.resizable().scaledToFill() } placeholder: { Image(systemName: "bubble.left.and.bubble.right.fill").font(.title2) }.frame(width: 46, height: 46).clipShape(RoundedRectangle(cornerRadius: 14))
-          Text(forum.name).font(.subheadline).lineLimit(1)
-          if forum.following { Text(tr(forum.signed ? "checkedIn" : "notCheckedIn")).font(.caption2).foregroundStyle(.secondary) }
+          AsyncImage(url: safeURL(forum.avatar)) { $0.resizable().scaledToFill() } placeholder: { Image(systemName: "bubble.left.and.bubble.right.fill").tiebaFont(.title2) }.frame(width: 46, height: 46).clipShape(RoundedRectangle(cornerRadius: 14))
+          Text(forum.name).tiebaFont(.subheadline).lineLimit(1)
+          if forum.following { Text(tr(forum.signed ? "checkedIn" : "notCheckedIn")).tiebaFont(.caption2).foregroundStyle(.secondary) }
         }.frame(maxWidth: .infinity).padding(.vertical, 7)
       }.buttonStyle(.plain).contextMenu { Button(tr("pin")) { app.updateLibrary { $0.togglePin(forum) } } }
     } } }
@@ -93,10 +93,10 @@ struct ForumView: View {
                 if index > 0 { Divider().padding(.leading, 38) }
                 NavigationLink(value: Route.thread(item.id, "", 1, false)) {
                   HStack(spacing: 10) {
-                    Image(systemName: "pin.fill").font(.caption).foregroundStyle(settings.accent)
-                    Text(item.title).font(.subheadline).foregroundStyle(Color(uiColor: .label)).lineLimit(1)
+                    Image(systemName: "pin.fill").tiebaFont(.caption).foregroundStyle(settings.accent)
+                    Text(item.title).tiebaFont(.subheadline).foregroundStyle(Color(uiColor: .label)).lineLimit(1)
                     Spacer(minLength: 0)
-                    Image(systemName: "chevron.right").font(.caption2).foregroundStyle(Color(uiColor: .tertiaryLabel))
+                    Image(systemName: "chevron.right").tiebaFont(.caption2).foregroundStyle(Color(uiColor: .tertiaryLabel))
                   }.padding(12).contentShape(Rectangle())
                 }.buttonStyle(.plain)
               }
@@ -163,16 +163,16 @@ struct ForumView: View {
           Image(systemName: "bubble.left.and.bubble.right.fill").foregroundStyle(settings.accent)
         }.frame(width: 44, height: 44).clipShape(RoundedRectangle(cornerRadius: 12))
         VStack(alignment: .leading, spacing: 4) {
-          Text(forum.name.isEmpty ? name : forum.name).font(.headline).foregroundStyle(Color(uiColor: .label))
+          Text(forum.name.isEmpty ? name : forum.name).tiebaFont(.headline).foregroundStyle(Color(uiColor: .label))
           if !settings.flag("hideForumIntroAndStat") {
             Text([forum.members.map { "\(tr("members")) \($0.formatted())" }, "\(tr("threads")) \(forum.threads.formatted())"].compactMap { $0 }.joined(separator: " · "))
-              .font(.caption).foregroundStyle(Color(uiColor: .secondaryLabel)).fixedSize(horizontal: false, vertical: true)
+              .tiebaFont(.caption).foregroundStyle(Color(uiColor: .secondaryLabel)).fixedSize(horizontal: false, vertical: true)
           }
         }
         Spacer(minLength: 0)
       }
       if !settings.flag("hideForumIntroAndStat") && !forum.intro.isEmpty {
-        Text(forum.intro).font(.subheadline).foregroundStyle(Color(uiColor: .secondaryLabel))
+        Text(forum.intro).tiebaFont(.subheadline).foregroundStyle(Color(uiColor: .secondaryLabel))
       }
       HStack {
         Button(tr(forum.following ? "unfollow" : "follow")) {
@@ -182,7 +182,7 @@ struct ForumView: View {
         Button(tr((signed || forum.signed) ? "checkedIn" : "checkIn"), systemImage: (signed || forum.signed) ? "checkmark.circle.fill" : "checkmark.circle") {
           perform { try await app.sign(forum); signed = true; feed.markSigned() }
         }.buttonStyle(.glassProminent).disabled(signed || forum.signed || action)
-      }.font(.subheadline)
+      }.tiebaFont(.subheadline)
     }.padding(14).frame(maxWidth: .infinity, alignment: .leading)
       .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
   }

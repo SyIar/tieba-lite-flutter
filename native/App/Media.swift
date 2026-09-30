@@ -85,7 +85,7 @@ struct RemotePicture: View {
           Color(uiColor: .tertiarySystemFill)
           if loading { ProgressView() }
           else if preview { Image(systemName: "photo").foregroundStyle(Color(uiColor: .secondaryLabel)) }
-          else { Button(tr(manual || automatic ? "retry" : "tapToLoad"), systemImage: "photo") { manual = true; attempt += 1 }.font(.caption) }
+          else { Button(tr(manual || automatic ? "retry" : "tapToLoad"), systemImage: "photo") { manual = true; attempt += 1 }.tiebaFont(.caption) }
         }.frame(height: preview ? 88 : 160)
       }
     }.clipShape(RoundedRectangle(cornerRadius: 10))
@@ -189,6 +189,7 @@ enum Emoticons {
 }
 
 struct RichContent: View {
+  @ScaledMetric(relativeTo: .body) private var textSize: CGFloat = 16
   let parts: [ContentPart]
   @EnvironmentObject private var settings: Preferences
   @State private var playback: URL?
@@ -227,6 +228,7 @@ struct RichContent: View {
         return accumulated + Text(Image(uiImage: scaled)).baselineOffset(-4)
       }
       var text = AttributedString(part.text)
+      text.font = Font(MixedScriptFont.font(size: textSize * settings.fontScale, bold: false))
       if part.type == 1 { text.link = part.url; text.foregroundColor = .blue }
       if part.type == 4, !part.sourceID.isEmpty { text.link = URL(string: "tblite://user?uid=\(part.sourceID)"); text.foregroundColor = .blue }
       return accumulated + Text(text)

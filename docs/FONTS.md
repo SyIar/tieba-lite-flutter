@@ -1,6 +1,20 @@
 # Bundled font provenance
 
-The application bundles the unmodified, static **Noto Sans CJK SC Regular 2.004**
+## Native mixed-script typography, 2026-09-30
+
+The current SwiftUI/UIKit target keeps Apple's system font for Latin text,
+numbers and emoji, and uses Source Han Serif Regular/Bold as CJK fallbacks.
+Both faces are bundled; there is no runtime font download. The same validated
+owner-uploaded assets are reused from a pinned Forum Lite repository revision.
+See [native font resources](../native/Resources/Fonts/README.md) for provenance,
+integrity checks, build preparation and the large-asset upload workflow.
+
+SwiftUI text respects Dynamic Type and the existing font-size setting.
+CoreText shaping checks exercise both weights and mixed-script strings.
+
+## Legacy Flutter font asset
+
+The legacy Flutter implementation bundled the unmodified, static **Noto Sans CJK SC Regular 2.004**
 OpenType font for offline Chinese rendering. This is the language-specific full
 CJK font, not a subset extracted from the current interface strings. Forum and
 post content can use the full coverage shipped by upstream.

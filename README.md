@@ -19,6 +19,8 @@ Windows 用于源码检查和旧协议 fixture 导出。原生编译和 Swift co
 
 原生实现和验证状态见 [SWIFT_MIGRATION.md](docs/SWIFT_MIGRATION.md)，操作说明见 [BUILD_IOS.md](docs/BUILD_IOS.md)。[FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md) 保留旧 Flutter 基线，不能作为原生版本的验收证明。
 
+字体采用混排：英文、数字和 emoji 使用苹果系统字体，汉字、日文假名和韩文使用内置的思源宋体 Regular/Bold。保留系统动态字号及 App 字号设置。构建复用已上传的固定版本字体文件，不需要重复上传，手机运行时也不下载字体。来源和校验流程见 [原生字体资源](native/Resources/Fonts/README.md)。
+
 ## 本地约束
 
 - 不运行 Gradle，不依赖公司 Maven，不新增 Java 单测。

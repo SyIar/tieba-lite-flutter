@@ -20,6 +20,9 @@ targets:
     sources:
       - App
       - Core
+      - path: Resources/Fonts
+        buildPhase: resources
+        excludes: [README.md, fonts.json]
       - path: ../ios/Runner/Assets.xcassets
         buildPhase: resources
       - path: ../lib/l10n/app_zh.arb
@@ -47,6 +50,7 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDevelopmentRegion: en
+        UIAppFonts: [SourceHanSerifSC-Regular.otf, SourceHanSerifSC-Bold.otf]
         LSRequiresIPhoneOS: true
         CFBundleDisplayName: Tieba Lite
         UILaunchScreen: {}

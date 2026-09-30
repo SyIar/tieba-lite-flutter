@@ -7,7 +7,7 @@ struct MeView: View {
   var body: some View {
     List {
       Section {
-        if let session = app.session { NavigationLink(value: Route.user(session.userID)) { HStack { Avatar(user: session.user, size: 52); VStack(alignment: .leading) { Text(session.user.name).font(.headline); Text(session.user.intro).font(.caption).foregroundStyle(.secondary) } } } }
+        if let session = app.session { NavigationLink(value: Route.user(session.userID)) { HStack { Avatar(user: session.user, size: 52); VStack(alignment: .leading) { Text(session.user.name).tiebaFont(.headline); Text(session.user.intro).tiebaFont(.caption).foregroundStyle(.secondary) } } } }
         else { Button(tr("signIn")) { app.login = true } }
       }
       Section {
@@ -62,7 +62,7 @@ struct CollectionView: View {
         Picker(tr("history"), selection: $historyTab) { Text(tr("threads")).tag("threads"); Text(tr("myForums")).tag("forums") }.pickerStyle(.segmented)
         if historyTab == "threads" {
           ForEach(Array(app.library.rows("history").enumerated()), id: \.offset) { _, row in
-            NavigationLink(value: Route.thread(string(row["threadId"]), string(row["lastPostId"]), max(1, integer(row["page"])), boolean(row["onlyAuthor"]))) { VStack(alignment: .leading, spacing: 6) { Text(string(row["title"])).lineLimit(2); Text(string(row["forumName"])).font(.caption).foregroundStyle(.secondary) } }
+            NavigationLink(value: Route.thread(string(row["threadId"]), string(row["lastPostId"]), max(1, integer(row["page"])), boolean(row["onlyAuthor"]))) { VStack(alignment: .leading, spacing: 6) { Text(string(row["title"])).lineLimit(2); Text(string(row["forumName"])).tiebaFont(.caption).foregroundStyle(.secondary) } }
               .swipeActions {
                 Button(tr("clear"), role: .destructive) {
                   app.updateLibrary { $0.document["history"] = $0.rows("history").filter { string($0["threadId"]) != string(row["threadId"]) } }
@@ -77,7 +77,7 @@ struct CollectionView: View {
         }
       } else if type == "forums" { ForEach(forums, id: \.name) { ForumRow(forum: $0) } }
       else { ForEach(result.items) { thread in
-        if type == "favorites" { NavigationLink { ThreadView(id: thread.id, initialAnchor: thread.anchor, initialPage: 1, initialAuthor: settings.flag("collectThreadSeeLz"), initialReverse: settings.flag("collectThreadDescSort"), resumeHistory: false) } label: { VStack(alignment: .leading, spacing: 6) { Text(thread.title); Text(thread.excerpt).font(.caption).lineLimit(2).foregroundStyle(.secondary) } } }
+        if type == "favorites" { NavigationLink { ThreadView(id: thread.id, initialAnchor: thread.anchor, initialPage: 1, initialAuthor: settings.flag("collectThreadSeeLz"), initialReverse: settings.flag("collectThreadDescSort"), resumeHistory: false) } label: { VStack(alignment: .leading, spacing: 6) { Text(thread.title); Text(thread.excerpt).tiebaFont(.caption).lineLimit(2).foregroundStyle(.secondary) } } }
         else { ThreadCard(thread: thread) }
       } }
       if type != "history" { LoadState(loading: loading, error: error, empty: result.items.isEmpty && forums.isEmpty) { request = UUID() } }
@@ -109,8 +109,8 @@ struct ProfileView: View {
     List {
       if let user = profile {
         Section {
-          HStack { Avatar(user: user, size: 66); VStack(alignment: .leading, spacing: 5) { Text(user.name).font(.title3.bold()); Text(user.intro).font(.subheadline).foregroundStyle(.secondary) } }.padding(.vertical, 8)
-          HStack { Text("\(tr("followers")) \(user.followers.formatted())"); Spacer(); Text("\(tr("following")) \(user.follows.formatted())"); Spacer(); Text("\(tr("posts")) \(user.posts.formatted())") }.font(.caption)
+          HStack { Avatar(user: user, size: 66); VStack(alignment: .leading, spacing: 5) { Text(user.name).tiebaFont(.title3, weight: .bold); Text(user.intro).tiebaFont(.subheadline).foregroundStyle(.secondary) } }.padding(.vertical, 8)
+          HStack { Text("\(tr("followers")) \(user.followers.formatted())"); Spacer(); Text("\(tr("following")) \(user.follows.formatted())"); Spacer(); Text("\(tr("posts")) \(user.posts.formatted())") }.tiebaFont(.caption)
           if app.activeID == user.id { Button(tr("editProfile")) { editing = true } }
           else { Button(tr(user.following ? "unfollow" : "follow")) { app.requireLogin { Task { @MainActor in do { try await app.api.follow(user, enabled: !user.following); request = UUID() } catch { app.error = error.localizedDescription } } } } }
         }
@@ -176,7 +176,7 @@ struct AvatarCrop: View {
   var body: some View {
     NavigationStack {
       VStack(spacing: 24) {
-        Text(tr("cropHint")).font(.subheadline).foregroundStyle(.secondary)
+        Text(tr("cropHint")).tiebaFont(.subheadline).foregroundStyle(.secondary)
         Image(uiImage: image).resizable().scaledToFill().frame(width: 280, height: 280).scaleEffect(scale).offset(offset).frame(width: 280, height: 280).clipped().overlay(Rectangle().stroke(.blue, lineWidth: 2))
           .gesture(DragGesture().onChanged { value in offset = constrained(value.translation) })
         Slider(value: $scale, in: 1...3).padding(.horizontal, 30).onChange(of: scale) { _, _ in offset = constrained(offset) }

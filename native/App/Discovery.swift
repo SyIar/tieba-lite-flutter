@@ -62,7 +62,7 @@ struct SearchView: View {
       } else {
         if kind == "threads" { ForEach(threads.items) { ThreadCard(thread: $0) } }
         else if kind == "forums" { ForEach(forums, id: \.name) { ForumRow(forum: $0) } }
-        else { ForEach(users) { user in NavigationLink(value: Route.user(user.id)) { HStack { Avatar(user: user); VStack(alignment: .leading) { Text(user.name); Text(user.intro).font(.caption).foregroundStyle(.secondary).lineLimit(2) } } } } }
+        else { ForEach(users) { user in NavigationLink(value: Route.user(user.id)) { HStack { Avatar(user: user); VStack(alignment: .leading) { Text(user.name); Text(user.intro).tiebaFont(.caption).foregroundStyle(.secondary).lineLimit(2) } } } } }
         LoadState(loading: loading, error: error, empty: threads.items.isEmpty && forums.isEmpty && users.isEmpty) { request = UUID() }
       }
     }.navigationTitle(forum.isEmpty ? tr("search") : forum)
@@ -109,9 +109,9 @@ struct InboxView: View {
           let post = first(item, ["post_id", "pid", "reply_pid"])
           NavigationLink(value: Route.thread(thread, post, 1, false)) {
             VStack(alignment: .leading, spacing: 7) {
-              Text(first(item, ["title", "thread_title"])).font(.subheadline.weight(.semibold)).lineLimit(2)
-              Text(first(item, ["content", "reply_content", "abstract"])).font(.subheadline).lineLimit(4)
-              Text(UserProfile(raw: object(item["replyer"] ?? item["user"])).name).font(.caption).foregroundStyle(.secondary)
+              Text(first(item, ["title", "thread_title"])).tiebaFont(.subheadline, weight: .semibold).lineLimit(2)
+              Text(first(item, ["content", "reply_content", "abstract"])).tiebaFont(.subheadline).lineLimit(4)
+              Text(UserProfile(raw: object(item["replyer"] ?? item["user"])).name).tiebaFont(.caption).foregroundStyle(.secondary)
             }
           }
         }
@@ -137,7 +137,7 @@ struct TopicsView: View {
     List {
       ForEach(Array(topics.enumerated()), id: \.offset) { index, row in
         let name = first(row, ["topic_name", "title", "name", "topic_desc"])
-        NavigationLink(value: Route.topic(first(row, ["topic_id", "id"]), name)) { HStack { Text(String(index + 1)).font(.headline).foregroundStyle(.tint).frame(width: 28); VStack(alignment: .leading, spacing: 4) { Text(name); Text(first(row, ["abstract", "discuss_num", "hot_value"])).font(.caption).foregroundStyle(.secondary) } } }
+        NavigationLink(value: Route.topic(first(row, ["topic_id", "id"]), name)) { HStack { Text(String(index + 1)).tiebaFont(.headline).foregroundStyle(.tint).frame(width: 28); VStack(alignment: .leading, spacing: 4) { Text(name); Text(first(row, ["abstract", "discuss_num", "hot_value"])).tiebaFont(.caption).foregroundStyle(.secondary) } } }
       }
       LoadState(loading: loading, error: error, empty: topics.isEmpty) { request = UUID() }
     }.navigationTitle(tr("hotTopics")).task(id: request) { loading = true; defer { loading = false }; do { topics = try await app.api.hotTopics() } catch { self.error = error.localizedDescription } }
