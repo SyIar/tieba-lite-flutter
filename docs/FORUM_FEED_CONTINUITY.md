@@ -37,9 +37,24 @@ page instead of maintaining a continuous feed.
 pins, current-page refresh, query reset, empty/final pages and gesture gating.
 Local repository language checks passed. Tree-sitter accepts the three changed
 Swift files; it is syntax-only and has pre-existing parser limitations elsewhere.
-CI results are recorded below when available. No simulator validation is used.
+CI results are recorded below. No simulator validation is used.
 
 Physical-device checks: read through pages 1–3, open a thread halfway down page 3,
 then use both the back button and interactive swipe to return. The same row and
 offset should remain, without loading or jumping. Repeat offline, switch between
 loaded pages, test refresh and sort/digest changes, and check the final page.
+
+## Verified package
+
+- Version: `0.2.0 (1012)`; source `85cdb862d18ad90ca9ca81ae4e96865ec399dbb3`.
+- [GitHub Actions run 36667233756](https://github.com/SyIar/tieba-lite-flutter/actions/runs/36667233756)
+  passed all 20 Swift core tests (11 new feed cases), Swift compiler parsing,
+  repository checks and the iPhone arm64 Release build.
+- Download: `D:\workspace\sideloadly-setup\TiebaLite-0.2.0-1012-unsigned.ipa`.
+- Size: `4,443,711` bytes.
+- SHA-256: `db80d7df2453112019af657c327b4e3d042cec492c410c128922becbaaadf8e4`.
+- Local verification confirmed CI/source metadata, SHA-256, ZIP integrity,
+  iPhoneOS/arm64 executable, original bundle identifier, build number, icon,
+  localization and emoticon resources, and absence of the Flutter runtime.
+- The package is unsigned for Sideloadly. Installation and physical-device
+  verification of the exact return offset remain pending.
